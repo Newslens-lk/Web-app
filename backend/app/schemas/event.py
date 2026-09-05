@@ -3,26 +3,17 @@ from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict
 
-from app.schemas.article import ArticleOut
+from app.schemas.article import ArticleInEvent
 
-# Recognized bias labels; anything else (including null/missing) is "unknown".
-BIAS_LABELS: tuple[str, ...] = ("left", "neutral", "right", "unknown")
+BIAS_LABELS = ("far_left", "left", "center", "right", "far_right")
 
 
 class BiasDistribution(BaseModel):
-    """Article counts per bias label. All four keys are always present."""
-
+    far_left: int = 0
     left: int = 0
-    neutral: int = 0
+    center: int = 0
     right: int = 0
-    unknown: int = 0
-
-
-class SourceBiasComparison(BaseModel):
-    source_name: str
-    article_count: int
-    bias_distribution: BiasDistribution
-    average_bias_confidence: float | None
+    far_right: int = 0
 
 
 class EventSummary(BaseModel):
@@ -35,9 +26,25 @@ class EventSummary(BaseModel):
     source_count: int
     window_start: datetime | None
     window_end: datetime | None
+    created_at: datetime
+    representative_title: str
+    sources: list[str]
 
 
-class EventDetail(EventSummary):
-    bias_overview: BiasDistribution = BiasDistribution()
-    source_bias_comparison: list[SourceBiasComparison] = []
-    articles: list[ArticleOut] = []
+class EventList(BaseModel):
+    events: list[EventSummary]
+    total: int
+    page: int
+    page_size: int
+
+
+class EventDetail(BaseModel):
+    event_id: UUID
+    summary: str | None
+    topic: str | None
+    article_count: int
+    source_count: int
+    window_start: datetime | None
+    window_end: datetime | None
+    articles: list[ArticleInEvent]
+    bias_distribution: BiasDistribution

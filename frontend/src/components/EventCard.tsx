@@ -1,7 +1,6 @@
 import Link from "next/link";
 import type { EventSummary } from "@/lib/types";
 import { relativeTime } from "@/lib/api";
-import { BiasBar } from "./BiasBar";
 import { SourceBadge } from "./SourceBadge";
 
 type Props = { event: EventSummary };

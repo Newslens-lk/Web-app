@@ -17,8 +17,6 @@ services:
       CORS_ORIGINS: http://localhost:3000
     networks:
       - newslens_pipeline_default
-    depends_on:
-      - news-db
 
   frontend:
     build: ./frontend

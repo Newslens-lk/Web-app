@@ -11,7 +11,7 @@ const links = [
 ];
 
 export function Nav() {
-  const pathname = usePathname();
+  const pathname = usePathname() ?? "/";
   return (
     <nav aria-label="Primary" className="ml-auto flex flex-wrap gap-1">
       {links.map((link) => {

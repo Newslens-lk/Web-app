@@ -12,7 +12,7 @@ export function FilterBar() {
 
   const update = useCallback(
     (key: string, value: string) => {
-      const sp = new URLSearchParams(params.toString());
+      const sp = new URLSearchParams(params?.toString() ?? "");
       if (value && value !== "all") {
         sp.set(key, value);
       } else {
@@ -29,7 +29,7 @@ export function FilterBar() {
       <select
         aria-label="Source"
         className={selectClass}
-        defaultValue={params.get("source") ?? "all"}
+        defaultValue={params?.get("source") ?? "all"}
         onChange={(e) => update("source", e.target.value)}
       >
         <option value="all">All sources</option>
@@ -42,7 +42,7 @@ export function FilterBar() {
       <select
         aria-label="Minimum sources"
         className={selectClass}
-        defaultValue={params.get("min_sources") ?? "all"}
+        defaultValue={params?.get("min_sources") ?? "all"}
         onChange={(e) => update("min_sources", e.target.value)}
       >
         <option value="all">Any coverage</option>

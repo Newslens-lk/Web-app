@@ -28,7 +28,7 @@ export default function AdminPage() {
       setRuns(status.runs);
       setHistory(hist.runs);
       setError(null);
-    } catch (err) {
+    } catch {
       setError("Failed to load pipeline data. Check your API key.");
     }
   }, [apiKey]);

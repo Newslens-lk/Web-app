@@ -15,12 +15,6 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="si">
-      <head>
-        <link
-          href="https://fonts.googleapis.com/css2?family=Noto+Sans+Sinhala:wght@400;500;600;700&display=swap"
-          rel="stylesheet"
-        />
-      </head>
       <body className="bg-bg text-ink font-sans text-[15px] leading-relaxed">
         <Masthead />
         <DisclaimerBar />

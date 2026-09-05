@@ -1,0 +1,113 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ---------- tokens: light (default) ---------- */
+:root {
+  --bg: #f5f5f0;
+  --surface: #ffffff;
+  --surface-2: #eceae2;
+  --surface-3: #e2dfd4;
+  --ink: #171a1c;
+  --ink-dim: #5b6165;
+  --ink-faint: #8a8f91;
+  --rule: #dad7cc;
+  --rule-strong: #c4c0b2;
+  --brand: #1b4b5a;
+  --brand-ink: #0f323d;
+  --brand-tint: #e4eeef;
+  --amber: #b9752a;
+  --amber-tint: #f6e9d6;
+  --good: #3f7a4f;
+  --spec-fl: #2c5c8a;
+  --spec-l: #6c97c0;
+  --spec-c: #9c9482;
+  --spec-r: #c98552;
+  --spec-fr: #9c3f26;
+
+  --font-serif: "Iowan Old Style", "Sitka Text", Georgia, "Noto Serif", serif;
+  --font-sans: -apple-system, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", "Cascadia Code", Consolas, monospace;
+}
+
+/* Dark tokens applied when: OS is dark AND user hasn't explicitly chosen light */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #14171a;
+    --surface: #1b1f23;
+    --surface-2: #23282d;
+    --surface-3: #2b3137;
+    --ink: #eceae3;
+    --ink-dim: #a7adb0;
+    --ink-faint: #767c80;
+    --rule: #32383e;
+    --rule-strong: #3d444b;
+    --brand: #7fb2c2;
+    --brand-ink: #cfe6ec;
+    --brand-tint: #1e333a;
+    --amber: #e3a55c;
+    --amber-tint: #3a2e1c;
+    --good: #6fbe83;
+    --spec-fl: #6e9bc9;
+    --spec-l: #8fb4d8;
+    --spec-c: #b3ac9c;
+    --spec-r: #d79e6e;
+    --spec-fr: #c56a4c;
+  }
+}
+
+/* Explicit dark override wins in both directions */
+:root[data-theme="dark"] {
+  --bg: #14171a;
+  --surface: #1b1f23;
+  --surface-2: #23282d;
+  --surface-3: #2b3137;
+  --ink: #eceae3;
+  --ink-dim: #a7adb0;
+  --ink-faint: #767c80;
+  --rule: #32383e;
+  --rule-strong: #3d444b;
+  --brand: #7fb2c2;
+  --brand-ink: #cfe6ec;
+  --brand-tint: #1e333a;
+  --amber: #e3a55c;
+  --amber-tint: #3a2e1c;
+  --good: #6fbe83;
+  --spec-fl: #6e9bc9;
+  --spec-l: #8fb4d8;
+  --spec-c: #b3ac9c;
+  --spec-r: #d79e6e;
+  --spec-fr: #c56a4c;
+}
+
+html,
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
+  }
+}

@@ -5,7 +5,7 @@ import { DisclaimerBar } from "@/components/DisclaimerBar";
 import { Footer } from "@/components/Footer";
 
 export const metadata: Metadata = {
-  title: "NewsLens.lk",
+  title: "NewsLens",
   description:
     "Compare how different Sri Lankan outlets report the same story — bias-aware Sinhala news aggregation.",
 };
@@ -14,7 +14,13 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en">
+    <html lang="si">
+      <head>
+        <link
+          href="https://fonts.googleapis.com/css2?family=Noto+Sans+Sinhala:wght@400;500;600;700&display=swap"
+          rel="stylesheet"
+        />
+      </head>
       <body className="bg-bg text-ink font-sans text-[15px] leading-relaxed">
         <Masthead />
         <DisclaimerBar />

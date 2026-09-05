@@ -1,46 +1,60 @@
+import { Suspense } from "react";
 import { FilterBar } from "@/components/FilterBar";
 import { EventCard } from "@/components/EventCard";
-import { events as mockEvents, type Event } from "@/lib/mock-events";
-import { getEventDetail, getEventSummaries, toUiEvent } from "@/lib/api";
+import { getEvents, getStats } from "@/lib/api";
 
-async function loadEvents(): Promise<Event[]> {
-  try {
-    const summaries = await getEventSummaries();
-    const details = await Promise.all(
-      summaries.map((summary) => getEventDetail(summary.event_id)),
-    );
-    return details.map(toUiEvent);
-  } catch (err) {
-    console.warn("Backend unreachable, falling back to mock events:", err);
-    return mockEvents;
-  }
-}
+type Props = { searchParams: Record<string, string | undefined> };
 
-export default async function HomePage() {
-  const events = await loadEvents();
-  const outletCount = new Set(
-    events.flatMap((event) => event.outlets.map((outlet) => outlet.name)),
-  ).size;
+export default async function HomePage({ searchParams }: Props) {
+  const params: Record<string, string> = {};
+  if (searchParams.source) params.source = searchParams.source;
+  if (searchParams.min_sources) params.min_sources = searchParams.min_sources;
+  if (searchParams.page) params.page = searchParams.page;
+
+  const [eventList, stats] = await Promise.all([
+    getEvents(params),
+    getStats(),
+  ]);
 
   return (
     <>
-      <FilterBar />
+      <div className="bg-surface-2 border border-rule rounded-lg px-5 py-3 mb-6 flex flex-wrap gap-x-6 gap-y-1 text-[13px]">
+        <span>
+          <span className="font-mono tabular-nums font-semibold">{stats.total_articles}</span>{" "}
+          articles
+        </span>
+        <span>
+          <span className="font-mono tabular-nums font-semibold">{stats.total_events}</span>{" "}
+          events
+        </span>
+        <span>
+          <span className="font-mono tabular-nums font-semibold">{stats.total_sources}</span>{" "}
+          sources
+        </span>
+      </div>
+
+      <Suspense>
+        <FilterBar />
+      </Suspense>
 
       <div className="flex justify-between items-baseline flex-wrap gap-2 mb-4">
         <h2 className="font-serif text-[20px] font-semibold text-balance">
-          Today&apos;s top stories
+          Latest events
         </h2>
         <span className="text-[13px] text-ink-dim">
-          <span className="font-mono tabular-nums">{events.length}</span> events
-          · <span className="font-mono tabular-nums">{outletCount}</span> outlets tracked
+          {eventList.total} total · page {eventList.page}
         </span>
       </div>
 
       <div className="grid gap-4 grid-cols-[repeat(auto-fill,minmax(300px,1fr))]">
-        {events.map((event) => (
-          <EventCard key={event.id} event={event} />
+        {eventList.events.map((event) => (
+          <EventCard key={event.event_id} event={event} />
         ))}
       </div>
+
+      {eventList.events.length === 0 && (
+        <p className="text-ink-dim text-center py-12">No events found.</p>
+      )}
     </>
   );
 }

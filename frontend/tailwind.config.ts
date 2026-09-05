@@ -3,9 +3,8 @@ import type { Config } from "tailwindcss";
 const config: Config = {
   darkMode: ["class", '[data-theme="dark"]'],
   content: [
-    "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
-    "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
-    "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/components/**/*.{ts,tsx}",
+    "./src/app/**/*.{ts,tsx}",
   ],
   theme: {
     extend: {
@@ -24,12 +23,6 @@ const config: Config = {
         "brand-tint": "var(--brand-tint)",
         amber: "var(--amber)",
         "amber-tint": "var(--amber-tint)",
-        good: "var(--good)",
-        "spec-fl": "var(--spec-fl)",
-        "spec-l": "var(--spec-l)",
-        "spec-c": "var(--spec-c)",
-        "spec-r": "var(--spec-r)",
-        "spec-fr": "var(--spec-fr)",
       },
       fontFamily: {
         serif: ["var(--font-serif)"],

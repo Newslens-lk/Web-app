@@ -2,7 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ---------- tokens: light (default) ---------- */
 :root {
   --bg: #f5f5f0;
   --surface: #ffffff;
@@ -18,19 +17,19 @@
   --brand-tint: #e4eeef;
   --amber: #b9752a;
   --amber-tint: #f6e9d6;
-  --good: #3f7a4f;
-  --spec-fl: #2c5c8a;
-  --spec-l: #6c97c0;
-  --spec-c: #9c9482;
-  --spec-r: #c98552;
-  --spec-fr: #9c3f26;
 
-  --font-serif: "Iowan Old Style", "Sitka Text", Georgia, "Noto Serif", serif;
-  --font-sans: -apple-system, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  /* 5-class bias colors from spec */
+  --bias-far-left: #DC2626;
+  --bias-left: #EA580C;
+  --bias-center: #6B7280;
+  --bias-right: #2563EB;
+  --bias-far-right: #1E3A8A;
+
+  --font-serif: "Noto Sans Sinhala", "Iowan Old Style", Georgia, serif;
+  --font-sans: "Noto Sans Sinhala", -apple-system, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
   --font-mono: ui-monospace, "SF Mono", "Cascadia Code", Consolas, monospace;
 }
 
-/* Dark tokens applied when: OS is dark AND user hasn't explicitly chosen light */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --bg: #14171a;
@@ -47,37 +46,7 @@
     --brand-tint: #1e333a;
     --amber: #e3a55c;
     --amber-tint: #3a2e1c;
-    --good: #6fbe83;
-    --spec-fl: #6e9bc9;
-    --spec-l: #8fb4d8;
-    --spec-c: #b3ac9c;
-    --spec-r: #d79e6e;
-    --spec-fr: #c56a4c;
   }
-}
-
-/* Explicit dark override wins in both directions */
-:root[data-theme="dark"] {
-  --bg: #14171a;
-  --surface: #1b1f23;
-  --surface-2: #23282d;
-  --surface-3: #2b3137;
-  --ink: #eceae3;
-  --ink-dim: #a7adb0;
-  --ink-faint: #767c80;
-  --rule: #32383e;
-  --rule-strong: #3d444b;
-  --brand: #7fb2c2;
-  --brand-ink: #cfe6ec;
-  --brand-tint: #1e333a;
-  --amber: #e3a55c;
-  --amber-tint: #3a2e1c;
-  --good: #6fbe83;
-  --spec-fl: #6e9bc9;
-  --spec-l: #8fb4d8;
-  --spec-c: #b3ac9c;
-  --spec-r: #d79e6e;
-  --spec-fr: #c56a4c;
 }
 
 html,

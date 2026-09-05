@@ -12,12 +12,8 @@ export function DisclaimerBar() {
           <strong className="text-ink font-semibold">
             Bias labels are model predictions,
           </strong>{" "}
-          not verified facts — and outlet names shown throughout this prototype
-          are illustrated with{" "}
-          <strong className="text-ink font-semibold">
-            placeholder demo data
-          </strong>
-          , not real assessments.
+          not verified facts. They are generated automatically and should not be
+          treated as authoritative assessments of any news organisation.
         </span>
       </div>
     </div>

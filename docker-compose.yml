@@ -1,0 +1,36 @@
+services:
+  backend:
+    build: ./backend
+    env_file: ./backend/.env
+    ports:
+      - "8000:8000"
+    environment:
+      DB_HOST: news-db
+      DB_PORT: 5432
+      DB_NAME: news_pipeline
+      DB_USER: news
+      DB_PASSWORD: ${NEWS_DB_PASSWORD:-news}
+      AIRFLOW_BASE_URL: http://airflow-apiserver:8080
+      AIRFLOW_USER: airflow
+      AIRFLOW_PASSWORD: ${AIRFLOW_PASSWORD:-airflow}
+      ADMIN_API_KEY: ${ADMIN_API_KEY:-changeme}
+      CORS_ORIGINS: http://localhost:3000
+    networks:
+      - newslens_pipeline_default
+    depends_on:
+      - news-db
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:3000"
+    environment:
+      NEXT_PUBLIC_API_BASE: http://backend:8000/api
+    networks:
+      - newslens_pipeline_default
+    depends_on:
+      - backend
+
+networks:
+  newslens_pipeline_default:
+    external: true

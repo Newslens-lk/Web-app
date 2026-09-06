@@ -1,18 +1,3 @@
-"""Security tests for the admin API-key check (app.api.admin.verify_admin).
-
-Covers §3.1.6 of the test plan: no admin route should be reachable without
-a valid X-API-Key. Two levels are tested:
-
-  1. verify_admin() called directly as a plain function — the fastest,
-     most isolated way to test the auth *logic* itself.
-  2. Through real HTTP requests via TestClient — proves the dependency is
-     actually wired onto every admin route, not just correct in isolation.
-
-Deliberately out of scope here: the "correct key -> pipeline call succeeds"
-path, since that requires mocking the Airflow HTTP client too. That belongs
-with function testing of admin.py's business logic, not this auth-focused
-file — see the test plan's §3.1.2 note.
-"""
 import pytest
 from fastapi import HTTPException
 
@@ -21,9 +6,6 @@ from app.api.admin import verify_admin
 
 FAKE_KEY = "test-secret-key"
 
-# Every route that must be protected by verify_admin. Parametrizing over
-# all three (rather than testing just one) is what would catch a bug like
-# forgetting `dependencies=[Depends(verify_admin)]` on a single route.
 ADMIN_ROUTES = [
     ("post", "/api/admin/pipeline/trigger"),
     ("get", "/api/admin/pipeline/status"),
@@ -39,9 +21,9 @@ def fixed_admin_key(monkeypatch):
     monkeypatch.setattr(admin_module.settings, "admin_api_key", FAKE_KEY)
 
 
-# ---------------------------------------------------------------------------
+
 # 1. verify_admin() as a plain function call — no HTTP involved.
-# ---------------------------------------------------------------------------
+
 
 
 def test_verify_admin_passes_silently_with_the_correct_key():
@@ -56,10 +38,8 @@ def test_verify_admin_raises_403_with_the_wrong_key():
     assert exc_info.value.detail == "Invalid API key"
 
 
-# ---------------------------------------------------------------------------
-# 2. Through real HTTP requests — proves the dependency is actually applied
-#    to every admin route.
-# ---------------------------------------------------------------------------
+# 2. Through real HTTP requests — proves the dependency is actually applied to every admin route.
+
 
 
 @pytest.mark.parametrize("method, path", ADMIN_ROUTES)

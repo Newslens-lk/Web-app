@@ -1,11 +1,15 @@
 import type { BiasLabel } from "./types";
 
+// These resolve to the --bias-* custom properties in globals.css rather than
+// to literal hex, so the swatches follow the active theme. They are applied as
+// inline `style` values, where `var(...)` is resolved by the browser exactly
+// like a hex string would be.
 export const BIAS_COLORS: Record<BiasLabel, string> = {
-  far_left: "#DC2626",
-  left: "#EA580C",
-  center: "#6B7280",
-  right: "#2563EB",
-  far_right: "#1E3A8A",
+  far_left: "var(--bias-far-left)",
+  left: "var(--bias-left)",
+  center: "var(--bias-center)",
+  right: "var(--bias-right)",
+  far_right: "var(--bias-far-right)",
 };
 
 export const BIAS_LABELS: BiasLabel[] = ["far_left", "left", "center", "right", "far_right"];

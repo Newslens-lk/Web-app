@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Nav } from "./Nav";
+import { ThemeToggle } from "./ThemeToggle";
 
 export function Masthead() {
   return (
@@ -16,6 +17,7 @@ export function Masthead() {
           ප්‍රධාන පුවත් සංසන්දනය කරන්න — compare Sinhala news coverage
         </span>
         <Nav />
+        <ThemeToggle />
       </div>
     </header>
   );

@@ -19,6 +19,3 @@ asyncio_mode = "auto"
 markers = [
     "integration: needs a real Postgres+pgvector database (news_pipeline_test)",
 ]
-markers = [
-    "integration: needs a real Postgres+pgvector database (news_pipeline_test)",
-]

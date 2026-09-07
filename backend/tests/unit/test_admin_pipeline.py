@@ -183,6 +183,17 @@ def test_pipeline_history_returns_runs_without_fetching_tasks(client, monkeypatc
     assert fake_client.get.call_count == 1
 
 
+def test_pipeline_history_returns_502_when_airflow_rejects_it(client, monkeypatch):
+    install_fake_airflow_client(
+        monkeypatch, get_side_effect=[FakeResponse(is_success=False, text="Service Unavailable")]
+    )
+
+    response = client.get("/api/admin/pipeline/history", headers=AUTH_HEADERS)
+
+    assert response.status_code == 502
+    assert "Service Unavailable" in response.json()["detail"]
+
+
 def test_pipeline_history_forwards_the_limit_query_param(client, monkeypatch):
     fake_client = install_fake_airflow_client(
         monkeypatch, get_side_effect=[FakeResponse(is_success=True, json_data={"dag_runs": []})]

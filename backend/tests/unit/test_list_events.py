@@ -114,3 +114,56 @@ def test_min_sources_filter_is_applied_to_the_query(client, override_get_db):
 
     assert "source_count" in compiled_sql
     assert " >= 3" in compiled_sql
+
+
+def test_topic_filter_is_applied_to_the_query(client, override_get_db):
+    fake_db = make_fake_db(total=0, events=[], rows_per_event=[])
+    override_get_db(fake_db)
+
+    client.get("/api/events?topic=politics")
+
+    stmt = fake_db.scalars.call_args.args[0]
+    compiled_sql = str(stmt.compile(compile_kwargs={"literal_binds": True}))
+
+    assert "topic" in compiled_sql
+    assert "'politics'" in compiled_sql
+
+
+def test_date_from_filter_is_applied_to_the_query(client, override_get_db):
+    fake_db = make_fake_db(total=0, events=[], rows_per_event=[])
+    override_get_db(fake_db)
+
+    client.get("/api/events?date_from=2026-01-01T00:00:00")
+
+    stmt = fake_db.scalars.call_args.args[0]
+    compiled_sql = str(stmt.compile(compile_kwargs={"literal_binds": True}))
+
+    assert "window_start >=" in compiled_sql
+
+
+def test_date_to_filter_is_applied_to_the_query(client, override_get_db):
+    fake_db = make_fake_db(total=0, events=[], rows_per_event=[])
+    override_get_db(fake_db)
+
+    client.get("/api/events?date_to=2026-12-31T23:59:59")
+
+    stmt = fake_db.scalars.call_args.args[0]
+    compiled_sql = str(stmt.compile(compile_kwargs={"literal_binds": True}))
+
+    assert "window_end <=" in compiled_sql
+
+
+def test_source_filter_uses_a_subquery_on_articles(client, override_get_db):
+    fake_db = make_fake_db(total=0, events=[], rows_per_event=[])
+    override_get_db(fake_db)
+
+    client.get("/api/events?source=BBC")
+
+    stmt = fake_db.scalars.call_args.args[0]
+    compiled_sql = str(stmt.compile(compile_kwargs={"literal_binds": True}))
+
+    # This filter works by matching events whose event_id shows up among
+    # articles from that source — an IN (subquery), not a direct column
+    # comparison, since Event itself has no source_name column.
+    assert "IN (SELECT" in compiled_sql.upper()
+    assert "'BBC'" in compiled_sql

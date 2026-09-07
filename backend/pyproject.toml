@@ -16,3 +16,6 @@ ignore = ["B008"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 asyncio_mode = "auto"
+markers = [
+    "integration: needs a real Postgres+pgvector database (news_pipeline_test)",
+]

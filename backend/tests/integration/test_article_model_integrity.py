@@ -15,32 +15,9 @@ import pytest
 from sqlalchemy.exc import IntegrityError
 
 from app.models.article import EMBEDDING_DIMENSION, Article
-from app.models.source import Source
+from tests.integration.factories import make_article, make_source
 
 pytestmark = pytest.mark.integration
-
-
-def make_source(db_session, name="BBC"):
-    source = Source(source_name=name, source_type="news")
-    db_session.add(source)
-    db_session.flush()  # sends the INSERT to Postgres, without committing
-    return source
-
-
-def make_article(db_session, **overrides):
-    defaults = dict(
-        article_id="int-test-a1",
-        source_name="BBC",
-        url="https://example.com/int-test-a1",
-        title="Integration Test Headline",
-        body="Body text.",
-        language="en",
-    )
-    defaults.update(overrides)
-    article = Article(**defaults)
-    db_session.add(article)
-    db_session.flush()
-    return article
 
 
 def test_insert_and_read_back_an_article(db_session):

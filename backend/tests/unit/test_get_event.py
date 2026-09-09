@@ -5,7 +5,7 @@ route also computes a bias_distribution from the articles it fetches —
 via the real _build_bias_distribution function (not mocked), so these
 fake articles need real bias_label values for that to mean anything.
 """
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from types import SimpleNamespace
 from unittest.mock import MagicMock
 
@@ -19,8 +19,8 @@ def make_fake_event(**overrides):
         topic="politics",
         article_count=2,
         source_count=2,
-        window_start=datetime(2026, 9, 1, tzinfo=timezone.utc),
-        window_end=datetime(2026, 9, 2, tzinfo=timezone.utc),
+        window_start=datetime(2026, 9, 1, tzinfo=UTC),
+        window_end=datetime(2026, 9, 2, tzinfo=UTC),
     )
     defaults.update(overrides)
     return SimpleNamespace(**defaults)
@@ -33,7 +33,7 @@ def make_fake_article(**overrides):
         url="https://example.com/a1",
         title="Test Headline",
         body="Body text.",
-        published_at=datetime(2026, 9, 1, tzinfo=timezone.utc),
+        published_at=datetime(2026, 9, 1, tzinfo=UTC),
         bias_label="left",
         bias_confidence=0.6,
         bias_scores=None,

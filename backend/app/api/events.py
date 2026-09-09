@@ -9,7 +9,7 @@ from app.db.session import get_db
 from app.models.article import Article
 from app.models.event import Event
 from app.schemas.article import ArticleInEvent
-from app.schemas.event import BiasDistribution, EventDetail, EventList, EventSummary, BIAS_LABELS
+from app.schemas.event import BIAS_LABELS, BiasDistribution, EventDetail, EventList, EventSummary
 
 router = APIRouter(prefix="/events", tags=["events"])
 

@@ -11,7 +11,7 @@ That fallback chain is exactly the kind of branching logic that's easy to
 get subtly wrong and easy to test precisely — which is most of what this
 file focuses on.
 """
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from types import SimpleNamespace
 from unittest.mock import MagicMock
 
@@ -25,9 +25,9 @@ def make_fake_event(**overrides):
         topic="politics",
         article_count=3,
         source_count=2,
-        window_start=datetime(2026, 9, 1, tzinfo=timezone.utc),
-        window_end=datetime(2026, 9, 2, tzinfo=timezone.utc),
-        created_at=datetime(2026, 9, 2, tzinfo=timezone.utc),
+        window_start=datetime(2026, 9, 1, tzinfo=UTC),
+        window_end=datetime(2026, 9, 2, tzinfo=UTC),
+        created_at=datetime(2026, 9, 2, tzinfo=UTC),
     )
     defaults.update(overrides)
     return SimpleNamespace(**defaults)
@@ -63,7 +63,8 @@ def test_default_pagination_is_page_1_size_20(client, override_get_db):
 
 def test_representative_title_uses_event_summary_when_present(client, override_get_db):
     event = make_fake_event(summary="A real written summary")
-    override_get_db(make_fake_db(total=1, events=[event], rows_per_event=[[("Some article title", "BBC")]]))
+    rows_per_event = [[("Some article title", "BBC")]]
+    override_get_db(make_fake_db(total=1, events=[event], rows_per_event=rows_per_event))
 
     response = client.get("/api/events")
 

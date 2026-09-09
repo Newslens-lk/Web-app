@@ -75,7 +75,9 @@ def test_includes_last_pipeline_run_when_airflow_is_reachable(client, override_g
     assert response.json()["last_pipeline_run"] == "2026-09-06T10:00:00+00:00"
 
 
-def test_last_pipeline_run_is_null_when_airflow_is_unreachable(client, override_get_db, monkeypatch):
+def test_last_pipeline_run_is_null_when_airflow_is_unreachable(
+    client, override_get_db, monkeypatch
+):
     monkeypatch.setattr(stats_module, "_get_last_pipeline_run", lambda: None)
     override_get_db(make_fake_db(counts=[0, 0, 0, 0, 0], bias_rows=[], source_rows=[]))
 

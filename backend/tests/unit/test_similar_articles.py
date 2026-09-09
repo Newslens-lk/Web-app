@@ -6,7 +6,7 @@ pgvector similarity query. Both are faked here — the real vector-distance
 math is never exercised by these tests, only the route's own branching
 logic (404 / empty-list / shape-the-results).
 """
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from types import SimpleNamespace
 from unittest.mock import MagicMock
 
@@ -24,7 +24,7 @@ def make_fake_row(article_id, distance):
         article_id=article_id,
         title=f"Title for {article_id}",
         source_name="BBC",
-        published_at=datetime(2026, 9, 1, tzinfo=timezone.utc),
+        published_at=datetime(2026, 9, 1, tzinfo=UTC),
         bias_label="center",
         distance=distance,
     )

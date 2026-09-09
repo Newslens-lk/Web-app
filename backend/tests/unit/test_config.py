@@ -40,7 +40,9 @@ def test_database_url_is_built_from_the_individual_db_fields():
 
 
 def test_cors_origin_list_splits_strips_and_drops_empty_entries():
-    settings = Settings(_env_file=None, cors_origins="http://localhost:3000, https://example.com ,,")
+    settings = Settings(
+        _env_file=None, cors_origins="http://localhost:3000, https://example.com ,,"
+    )
 
     assert settings.cors_origin_list == ["http://localhost:3000", "https://example.com"]
 

@@ -26,7 +26,11 @@ def _airflow_client() -> httpx.Client:
     )
 
 
-@router.post("/pipeline/trigger", response_model=PipelineTriggerResponse, dependencies=[Depends(verify_admin)])
+@router.post(
+    "/pipeline/trigger",
+    response_model=PipelineTriggerResponse,
+    dependencies=[Depends(verify_admin)],
+)
 def trigger_pipeline() -> PipelineTriggerResponse:
     with _airflow_client() as client:
         resp = client.post(
@@ -60,7 +64,11 @@ def _fetch_tasks(client: httpx.Client, dag_run_id: str) -> list[TaskStatus]:
     ]
 
 
-@router.get("/pipeline/status", response_model=PipelineStatusResponse, dependencies=[Depends(verify_admin)])
+@router.get(
+    "/pipeline/status",
+    response_model=PipelineStatusResponse,
+    dependencies=[Depends(verify_admin)],
+)
 def pipeline_status() -> PipelineStatusResponse:
     with _airflow_client() as client:
         resp = client.get(
@@ -84,7 +92,11 @@ def pipeline_status() -> PipelineStatusResponse:
         return PipelineStatusResponse(runs=runs)
 
 
-@router.get("/pipeline/history", response_model=PipelineStatusResponse, dependencies=[Depends(verify_admin)])
+@router.get(
+    "/pipeline/history",
+    response_model=PipelineStatusResponse,
+    dependencies=[Depends(verify_admin)],
+)
 def pipeline_history(
     limit: int = Query(default=20, ge=1, le=50),
 ) -> PipelineStatusResponse:

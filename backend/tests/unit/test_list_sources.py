@@ -5,7 +5,7 @@ sources and articles, specifically so a source with zero articles still
 shows up (with article_count: 0) instead of disappearing. An INNER join
 would silently drop it — that's the regression these tests guard against.
 """
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from types import SimpleNamespace
 from unittest.mock import MagicMock
 
@@ -51,7 +51,7 @@ def test_multiple_sources_are_all_returned_with_correct_fields(client, override_
     rows = [
         make_fake_row(
             "BBC", article_count=42,
-            latest_article_at=datetime(2026, 9, 6, tzinfo=timezone.utc),
+            latest_article_at=datetime(2026, 9, 6, tzinfo=UTC),
         ),
         make_fake_row("CNN", article_count=10, latest_article_at=None),
     ]

@@ -83,7 +83,9 @@ def get_similar_articles(
     rows = db.execute(
         text("""
             SELECT article_id, title, source_name, published_at, bias_label,
-                   embedding <-> (SELECT embedding FROM articles WHERE article_id = :aid) AS distance
+                   embedding <-> (
+                       SELECT embedding FROM articles WHERE article_id = :aid
+                   ) AS distance
             FROM articles
             WHERE article_id != :aid AND embedding IS NOT NULL
             ORDER BY distance

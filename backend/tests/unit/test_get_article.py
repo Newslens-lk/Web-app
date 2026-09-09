@@ -5,7 +5,7 @@ in tests/conftest.py) for a fake session whose `.get()` we control directly.
 This tests only the route's own logic: does it 404 correctly, and does it
 shape a found article into the right JSON?
 """
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from types import SimpleNamespace
 from unittest.mock import MagicMock
 
@@ -24,8 +24,8 @@ def make_fake_article():
         title="Test Headline",
         body="Full article body text.",
         language="en",
-        published_at=datetime(2026, 9, 1, tzinfo=timezone.utc),
-        scraped_at=datetime(2026, 9, 1, 1, tzinfo=timezone.utc),
+        published_at=datetime(2026, 9, 1, tzinfo=UTC),
+        scraped_at=datetime(2026, 9, 1, 1, tzinfo=UTC),
         bias_label="center",
         bias_confidence=0.82,
         bias_scores={

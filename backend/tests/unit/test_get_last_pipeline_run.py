@@ -8,7 +8,6 @@ philosophy as verify_admin in test_admin_auth.py — fastest, most
 isolated way to test this specific piece of logic.
 """
 import httpx
-import pytest
 
 from app.api import stats as stats_module
 from app.api.stats import _get_last_pipeline_run

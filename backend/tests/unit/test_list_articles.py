@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from types import SimpleNamespace
 from unittest.mock import MagicMock
 
@@ -19,7 +19,7 @@ def make_fake_article(**overrides):
         source_name="BBC",
         url="https://example.com/a1",
         title="Test Headline",
-        published_at=datetime(2026, 9, 1, tzinfo=timezone.utc),
+        published_at=datetime(2026, 9, 1, tzinfo=UTC),
         bias_label="center",
         bias_confidence=0.7,
         event_id=None,

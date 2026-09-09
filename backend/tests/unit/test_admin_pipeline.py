@@ -167,7 +167,12 @@ def test_pipeline_history_returns_runs_without_fetching_tasks(client, monkeypatc
                 is_success=True,
                 json_data={
                     "dag_runs": [
-                        {"dag_run_id": "run1", "state": "success", "start_date": None, "end_date": None}
+                        {
+                            "dag_run_id": "run1",
+                            "state": "success",
+                            "start_date": None,
+                            "end_date": None,
+                        }
                     ]
                 },
             )

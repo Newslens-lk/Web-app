@@ -7,16 +7,60 @@ import type {
   Stats,
   PipelineRun,
   ArticleSummary,
+  User,
 } from "./types";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "http://localhost:8000/api";
 
 async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
-  const res = await fetch(`${API_BASE}${path}`, { cache: "no-store", ...init });
+  const res = await fetch(`${API_BASE}${path}`, {
+    cache: "no-store",
+    credentials: "include",
+    ...init,
+  });
   if (!res.ok) {
-    throw new Error(`API ${path} failed: ${res.status}`);
+    let detail = `Request failed (${res.status})`;
+    try {
+      const body = (await res.json()) as { detail?: string };
+      if (body.detail) detail = body.detail;
+    } catch {
+      // Keep the status-based message when the response is not JSON.
+    }
+    throw new Error(detail);
   }
+  if (res.status === 204) return undefined as T;
   return res.json() as Promise<T>;
+}
+
+export function registerUser(payload: {
+  email: string;
+  display_name: string;
+  password: string;
+}): Promise<{ user: User }> {
+  return apiFetch("/auth/register", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+}
+
+export function loginUser(payload: {
+  email: string;
+  password: string;
+}): Promise<{ user: User }> {
+  return apiFetch("/auth/login", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+}
+
+export function getCurrentUser(): Promise<User> {
+  return apiFetch<User>("/auth/me");
+}
+
+export function logoutUser(): Promise<void> {
+  return apiFetch<void>("/auth/logout", { method: "POST" });
 }
 
 export function getEvents(params?: Record<string, string>): Promise<EventList> {

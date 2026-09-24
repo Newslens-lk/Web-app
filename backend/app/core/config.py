@@ -21,6 +21,9 @@ class Settings(BaseSettings):
     airflow_password: str = "airflow"
 
     admin_api_key: str = "changeme"
+    admin_email: str = ""
+    admin_password: str = ""
+    admin_display_name: str = "NewsLens Admin"
     auth_secret: str = "change-this-auth-secret"
 
     @property

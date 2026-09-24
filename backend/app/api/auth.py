@@ -53,7 +53,7 @@ def logout(response: Response):
 
 
 @router.get("/me", response_model=UserResponse)
-def current_user(
+def get_current_user(
     session: str | None = Cookie(default=None, alias=SESSION_COOKIE),
     db: Session = Depends(get_db),
 ):
@@ -62,6 +62,19 @@ def current_user(
     if not user or not user.is_active:
         raise HTTPException(status_code=401, detail="Not authenticated")
     return UserResponse.model_validate(user)
+
+
+def require_admin(
+    session: str | None = Cookie(default=None, alias=SESSION_COOKIE),
+    db: Session = Depends(get_db),
+) -> User:
+    user_id = read_session_token(session) if session else None
+    user = db.get(User, user_id) if user_id else None
+    if not user or not user.is_active:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+    if user.role != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    return user
 
 
 def _set_session_cookie(response: Response, user_id: int) -> None:

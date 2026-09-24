@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { getPipelineStatus, getPipelineHistory, triggerPipeline } from "@/lib/api";
+import { getCurrentUser, getPipelineStatus, getPipelineHistory, triggerPipeline } from "@/lib/api";
 import type { PipelineRun } from "@/lib/types";
 
 const STATE_ICON: Record<string, string> = {
@@ -12,8 +12,7 @@ const STATE_ICON: Record<string, string> = {
 };
 
 export default function AdminPage() {
-  const [apiKey, setApiKey] = useState("");
-  const [authed, setAuthed] = useState(false);
+  const [authed, setAuthed] = useState<boolean | null>(null);
   const [runs, setRuns] = useState<PipelineRun[]>([]);
   const [history, setHistory] = useState<PipelineRun[]>([]);
   const [triggering, setTriggering] = useState(false);
@@ -22,16 +21,25 @@ export default function AdminPage() {
   const load = useCallback(async () => {
     try {
       const [status, hist] = await Promise.all([
-        getPipelineStatus(apiKey),
-        getPipelineHistory(apiKey),
+        getPipelineStatus(),
+        getPipelineHistory(),
       ]);
       setRuns(status.runs);
       setHistory(hist.runs);
       setError(null);
     } catch {
-      setError("Failed to load pipeline data. Check your API key.");
+      setError("Failed to load pipeline data.");
     }
-  }, [apiKey]);
+  }, []);
+
+  useEffect(() => {
+    getCurrentUser()
+      .then((user) => {
+        if (user.role !== "admin") throw new Error("not-admin");
+        setAuthed(true);
+      })
+      .catch(() => setAuthed(false));
+  }, []);
 
   useEffect(() => {
     if (authed) load();
@@ -40,7 +48,7 @@ export default function AdminPage() {
   async function handleTrigger() {
     setTriggering(true);
     try {
-      await triggerPipeline(apiKey);
+      await triggerPipeline();
       await load();
     } catch {
       setError("Failed to trigger pipeline.");
@@ -48,22 +56,19 @@ export default function AdminPage() {
     setTriggering(false);
   }
 
+  if (authed === null) {
+    return <p className="py-12 text-[14px] text-ink-dim">Checking admin access…</p>;
+  }
+
   if (!authed) {
     return (
       <div className="max-w-sm py-12">
         <h1 className="font-serif text-[24px] font-semibold mb-4">Admin Panel</h1>
-        <label className="block text-[13px] text-ink-dim mb-1">API Key</label>
-        <input
-          type="password"
-          value={apiKey}
-          onChange={(e) => setApiKey(e.target.value)}
-          className="w-full bg-surface border border-rule-strong rounded-md px-3 py-2 text-[14px] text-ink mb-3"
-        />
         <button
-          onClick={() => setAuthed(true)}
+          onClick={() => (window.location.href = "/login")}
           className="bg-brand text-white px-4 py-2 rounded-md text-[14px] font-semibold hover:opacity-90"
         >
-          Login
+          Admin login
         </button>
       </div>
     );

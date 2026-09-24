@@ -99,6 +99,14 @@ export type Stats = {
   last_pipeline_run: string | null;
 };
 
+export type User = {
+  id: number;
+  email: string;
+  display_name: string;
+  role: string;
+  created_at: string;
+};
+
 export type PipelineRun = {
   dag_run_id: string;
   state: string;

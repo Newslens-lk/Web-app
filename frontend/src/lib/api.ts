@@ -93,23 +93,18 @@ export function getStats(): Promise<Stats> {
   return apiFetch<Stats>(`/stats`);
 }
 
-export function triggerPipeline(apiKey: string): Promise<{ dag_run_id: string; state: string }> {
+export function triggerPipeline(): Promise<{ dag_run_id: string; state: string }> {
   return apiFetch(`/admin/pipeline/trigger`, {
     method: "POST",
-    headers: { "X-API-Key": apiKey },
   });
 }
 
-export function getPipelineStatus(apiKey: string): Promise<{ runs: PipelineRun[] }> {
-  return apiFetch(`/admin/pipeline/status`, {
-    headers: { "X-API-Key": apiKey },
-  });
+export function getPipelineStatus(): Promise<{ runs: PipelineRun[] }> {
+  return apiFetch(`/admin/pipeline/status`);
 }
 
-export function getPipelineHistory(apiKey: string, limit = 20): Promise<{ runs: PipelineRun[] }> {
-  return apiFetch(`/admin/pipeline/history?limit=${limit}`, {
-    headers: { "X-API-Key": apiKey },
-  });
+export function getPipelineHistory(limit = 20): Promise<{ runs: PipelineRun[] }> {
+  return apiFetch(`/admin/pipeline/history?limit=${limit}`);
 }
 
 export function relativeTime(iso: string | null): string {

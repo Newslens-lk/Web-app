@@ -1,6 +1,7 @@
 import httpx
-from fastapi import APIRouter, Depends, Header, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query
 
+from app.api.auth import require_admin
 from app.core.config import get_settings
 from app.schemas.admin import (
     PipelineRun,
@@ -13,11 +14,6 @@ router = APIRouter(prefix="/admin", tags=["admin"])
 settings = get_settings()
 
 
-def verify_admin(x_api_key: str = Header()) -> None:
-    if x_api_key != settings.admin_api_key:
-        raise HTTPException(status_code=403, detail="Invalid API key")
-
-
 def _airflow_client() -> httpx.Client:
     return httpx.Client(
         base_url=settings.airflow_base_url,
@@ -26,7 +22,11 @@ def _airflow_client() -> httpx.Client:
     )
 
 
-@router.post("/pipeline/trigger", response_model=PipelineTriggerResponse, dependencies=[Depends(verify_admin)])
+@router.post(
+    "/pipeline/trigger",
+    response_model=PipelineTriggerResponse,
+    dependencies=[Depends(require_admin)],
+)
 def trigger_pipeline() -> PipelineTriggerResponse:
     with _airflow_client() as client:
         resp = client.post(
@@ -60,7 +60,11 @@ def _fetch_tasks(client: httpx.Client, dag_run_id: str) -> list[TaskStatus]:
     ]
 
 
-@router.get("/pipeline/status", response_model=PipelineStatusResponse, dependencies=[Depends(verify_admin)])
+@router.get(
+    "/pipeline/status",
+    response_model=PipelineStatusResponse,
+    dependencies=[Depends(require_admin)],
+)
 def pipeline_status() -> PipelineStatusResponse:
     with _airflow_client() as client:
         resp = client.get(
@@ -84,7 +88,11 @@ def pipeline_status() -> PipelineStatusResponse:
         return PipelineStatusResponse(runs=runs)
 
 
-@router.get("/pipeline/history", response_model=PipelineStatusResponse, dependencies=[Depends(verify_admin)])
+@router.get(
+    "/pipeline/history",
+    response_model=PipelineStatusResponse,
+    dependencies=[Depends(require_admin)],
+)
 def pipeline_history(
     limit: int = Query(default=20, ge=1, le=50),
 ) -> PipelineStatusResponse:

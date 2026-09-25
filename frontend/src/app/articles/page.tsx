@@ -3,6 +3,7 @@ import Link from "next/link";
 import { getArticles, relativeTime } from "@/lib/api";
 import { BiasLabel } from "@/components/BiasLabel";
 import { ArticleFilters } from "@/components/ArticleFilters";
+import { ArticleImage } from "@/components/ArticleImage";
 
 type Props = { searchParams: Record<string, string | undefined> };
 
@@ -67,6 +68,11 @@ export default async function ArticlesPage({ searchParams }: Props) {
       <div className="space-y-3">
         {result.articles.map((article) => (
           <article key={article.article_id} className="rounded-lg border border-rule bg-surface p-4">
+            <ArticleImage
+              src={article.image_url}
+              alt={article.title}
+              className="mb-3 h-40 w-full rounded-md object-cover"
+            />
             <div className="flex flex-wrap items-center gap-2">
               <BiasLabel label={article.bias_label} confidence={article.bias_confidence} />
             </div>

@@ -5,6 +5,7 @@ import { BiasBar } from "@/components/BiasBar";
 import { BiasLabel } from "@/components/BiasLabel";
 import { SourceBadge } from "@/components/SourceBadge";
 import { BIAS_LABELS, BIAS_DISPLAY, BIAS_COLORS } from "@/lib/constants";
+import { ArticleImage } from "@/components/ArticleImage";
 
 type Props = { params: { eventId: string } };
 
@@ -65,6 +66,11 @@ export default async function EventDetailPage({ params }: Props) {
             key={article.article_id}
             className="bg-surface border border-rule rounded-[10px] p-4 flex flex-col gap-2"
           >
+            <ArticleImage
+              src={article.image_url}
+              alt={article.title}
+              className="h-40 w-full rounded-md object-cover"
+            />
             <div className="flex items-center justify-between gap-2">
               <SourceBadge name={article.source_name} />
               <BiasLabel

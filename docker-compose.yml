@@ -12,7 +12,6 @@ services:
       DB_PASSWORD: ${NEWS_DB_PASSWORD:-news}
       AIRFLOW_BASE_URL: http://airflow-apiserver:8080
       AIRFLOW_USER: airflow
-      AIRFLOW_PASSWORD: ${AIRFLOW_PASSWORD:-airflow}
       ADMIN_API_KEY: ${ADMIN_API_KEY:-changeme}
       CORS_ORIGINS: http://localhost:3000
     networks:

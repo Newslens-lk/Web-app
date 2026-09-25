@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import Link from "next/link";
 import { FilterBar } from "@/components/FilterBar";
 import { EventCard } from "@/components/EventCard";
 import { getEvents, getStats } from "@/lib/api";
@@ -15,6 +16,16 @@ export default async function HomePage({ searchParams }: Props) {
     getEvents(params),
     getStats(),
   ]);
+
+  const totalPages = Math.ceil(eventList.total / eventList.page_size);
+  const pageUrl = (page: number) => {
+    const query = new URLSearchParams();
+    for (const [key, value] of Object.entries(searchParams)) {
+      if (key !== "page" && value) query.set(key, value);
+    }
+    query.set("page", String(page));
+    return `/?${query.toString()}`;
+  };
 
   return (
     <>
@@ -54,6 +65,40 @@ export default async function HomePage({ searchParams }: Props) {
 
       {eventList.events.length === 0 && (
         <p className="text-ink-dim text-center py-12">No events found.</p>
+      )}
+
+      {totalPages > 1 && (
+        <nav aria-label="Event pages" className="mt-8 flex items-center justify-center gap-3 text-[13px]">
+          {eventList.page > 1 ? (
+            <Link
+              href={pageUrl(eventList.page - 1)}
+              className="rounded-md border border-rule-strong bg-surface px-3 py-2 font-semibold text-ink-dim hover:bg-surface-2 hover:text-ink"
+            >
+              Previous
+            </Link>
+          ) : (
+            <span className="rounded-md border border-rule bg-surface-2 px-3 py-2 text-ink-faint">
+              Previous
+            </span>
+          )}
+
+          <span className="text-ink-dim">
+            Page {eventList.page} of {totalPages}
+          </span>
+
+          {eventList.page < totalPages ? (
+            <Link
+              href={pageUrl(eventList.page + 1)}
+              className="rounded-md border border-rule-strong bg-surface px-3 py-2 font-semibold text-ink-dim hover:bg-surface-2 hover:text-ink"
+            >
+              Next
+            </Link>
+          ) : (
+            <span className="rounded-md border border-rule bg-surface-2 px-3 py-2 text-ink-faint">
+              Next
+            </span>
+          )}
+        </nav>
       )}
     </>
   );

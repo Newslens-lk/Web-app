@@ -25,6 +25,16 @@ def _build_bias_distribution(articles: list[Article]) -> BiasDistribution:
     return BiasDistribution(**counts)
 
 
+def _build_bias_distribution_from_rows(rows) -> BiasDistribution:
+    counts: dict[str, int] = {label: 0 for label in BIAS_LABELS}
+    for row in rows:
+        label = (row[2] if len(row) > 2 else "") or ""
+        label = label.strip().lower()
+        if label in _KNOWN_LABELS:
+            counts[label] += 1
+    return BiasDistribution(**counts)
+
+
 @router.get("", response_model=EventList)
 def list_events(
     page: int = Query(default=1, ge=1),
@@ -62,7 +72,7 @@ def list_events(
     summaries = []
     for event in events:
         rows = db.execute(
-            select(Article.title, Article.source_name)
+            select(Article.title, Article.source_name, Article.bias_label)
             .where(Article.event_id == event.event_id)
             .order_by(Article.published_at.desc().nullslast())
         ).all()
@@ -82,6 +92,7 @@ def list_events(
                 created_at=event.created_at,
                 representative_title=rep_title,
                 sources=sources_list,
+                bias_distribution=_build_bias_distribution_from_rows(rows),
             )
         )
 

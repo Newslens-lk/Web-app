@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { EventSummary } from "@/lib/types";
 import { relativeTime } from "@/lib/api";
+import { BIAS_COLORS, BIAS_DISPLAY, BIAS_LABELS } from "@/lib/constants";
 import { SourceBadge } from "./SourceBadge";
 
 type Props = { event: EventSummary };
@@ -22,6 +23,37 @@ export function EventCard({ event }: Props) {
       <p className="text-[13px] text-ink-dim leading-snug">
         {event.article_count} article{event.article_count !== 1 && "s"} · {event.source_count} source{event.source_count !== 1 && "s"} · {relativeTime(event.window_end)}
       </p>
+      <div
+        className="mt-1 flex h-2.5 w-full overflow-hidden rounded-full bg-surface-2"
+        role="img"
+        aria-label="Bias distribution"
+        title={BIAS_LABELS
+          .map((label) => `${BIAS_DISPLAY[label]}: ${event.bias_distribution[label]}`)
+          .join(" · ")}
+      >
+        {BIAS_LABELS.map((label) => {
+          const count = event.bias_distribution[label];
+          if (!count || !event.article_count) return null;
+          return (
+            <span
+              key={label}
+              className="h-full"
+              style={{
+                width: `${(count / event.article_count) * 100}%`,
+                backgroundColor: BIAS_COLORS[label],
+              }}
+            />
+          );
+        })}
+      </div>
+      <div className="flex flex-wrap gap-x-3 gap-y-1 text-[10px] text-ink-dim">
+        {BIAS_LABELS.map((label) => (
+          <span key={label} className="inline-flex items-center gap-1">
+            <span className="h-2 w-2 rounded-sm" style={{ backgroundColor: BIAS_COLORS[label] }} />
+            {BIAS_DISPLAY[label]} ({event.bias_distribution[label]})
+          </span>
+        ))}
+      </div>
       <div className="flex flex-wrap gap-1">
         {event.sources.map((s) => (
           <SourceBadge key={s} name={s} />

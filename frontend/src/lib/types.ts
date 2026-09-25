@@ -13,6 +13,7 @@ export type EventSummary = {
   created_at: string;
   representative_title: string;
   sources: string[];
+  bias_distribution: BiasDistribution;
 };
 
 export type EventList = {

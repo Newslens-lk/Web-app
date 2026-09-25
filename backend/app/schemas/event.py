@@ -29,6 +29,7 @@ class EventSummary(BaseModel):
     created_at: datetime
     representative_title: str
     sources: list[str]
+    bias_distribution: BiasDistribution
 
 
 class EventList(BaseModel):

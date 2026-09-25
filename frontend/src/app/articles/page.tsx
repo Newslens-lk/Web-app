@@ -2,16 +2,23 @@ import Link from "next/link";
 
 import { getArticles, relativeTime } from "@/lib/api";
 import { BiasLabel } from "@/components/BiasLabel";
+import { ArticleFilters } from "@/components/ArticleFilters";
 
 type Props = { searchParams: Record<string, string | undefined> };
 
 export default async function ArticlesPage({ searchParams }: Props) {
   const source = searchParams.source;
   const biasLabel = searchParams.bias_label;
+  const search = searchParams.search;
+  const dateFrom = searchParams.date_from;
+  const dateTo = searchParams.date_to;
   const page = Number(searchParams.page ?? "1") || 1;
   const result = await getArticles({
     ...(source ? { source } : {}),
     ...(biasLabel ? { bias_label: biasLabel } : {}),
+    ...(search ? { search } : {}),
+    ...(dateFrom ? { date_from: dateFrom } : {}),
+    ...(dateTo ? { date_to: dateTo } : {}),
     page: String(page),
   });
   const totalPages = Math.ceil(result.total / result.page_size);
@@ -20,6 +27,9 @@ export default async function ArticlesPage({ searchParams }: Props) {
     const query = new URLSearchParams();
     if (source) query.set("source", source);
     if (biasLabel) query.set("bias_label", biasLabel);
+    if (search) query.set("search", search);
+    if (dateFrom) query.set("date_from", dateFrom);
+    if (dateTo) query.set("date_to", dateTo);
     query.set("page", String(nextPage));
     return `/articles?${query.toString()}`;
   };
@@ -45,6 +55,14 @@ export default async function ArticlesPage({ searchParams }: Props) {
           These are individual articles collected before event clustering.
         </p>
       </div>
+
+      <ArticleFilters
+        search={search}
+        source={source}
+        biasLabel={biasLabel}
+        dateFrom={dateFrom}
+        dateTo={dateTo}
+      />
 
       <div className="space-y-3">
         {result.articles.map((article) => (

@@ -51,6 +51,7 @@ export type ArticleSummary = {
   source_name: string;
   url: string;
   title: string;
+  body_excerpt: string | null;
   published_at: string | null;
   bias_label: BiasLabel | null;
   bias_confidence: number | null;
@@ -97,6 +98,14 @@ export type Stats = {
   bias_breakdown: Record<string, number>;
   articles_per_source: Record<string, number>;
   last_pipeline_run: string | null;
+};
+
+export type User = {
+  id: number;
+  email: string;
+  display_name: string;
+  role: string;
+  created_at: string;
 };
 
 export type PipelineRun = {

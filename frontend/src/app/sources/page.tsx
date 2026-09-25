@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { getSources } from "@/lib/api";
 import { SourceBadge } from "@/components/SourceBadge";
 import { relativeTime } from "@/lib/api";
@@ -11,9 +12,10 @@ export default async function SourcesPage() {
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {sources.map((source) => (
-          <div
+          <Link
             key={source.source_name}
-            className="bg-surface border border-rule rounded-[10px] p-5 flex flex-col gap-2"
+            href={`/articles?source=${encodeURIComponent(source.source_name)}`}
+            className="bg-surface border border-rule rounded-[10px] p-5 flex flex-col gap-2 transition-shadow hover:border-rule-strong hover:shadow-card"
           >
             <SourceBadge name={source.source_name} />
             <div className="text-[13px] text-ink-dim mt-1">
@@ -30,7 +32,7 @@ export default async function SourcesPage() {
                   : "none yet"}
               </p>
             </div>
-          </div>
+          </Link>
         ))}
       </div>
 

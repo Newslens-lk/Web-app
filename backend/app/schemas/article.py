@@ -11,6 +11,7 @@ class ArticleSummary(BaseModel):
     source_name: str
     url: str
     title: str
+    body_excerpt: str | None
     published_at: datetime | None
     bias_label: str | None
     bias_confidence: float | None

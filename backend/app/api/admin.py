@@ -1,6 +1,10 @@
-import httpx
-from fastapi import APIRouter, Depends, Header, HTTPException, Query
+from collections.abc import Iterator
+from contextlib import contextmanager
 
+import httpx
+from fastapi import APIRouter, Depends, HTTPException, Query
+
+from app.api.auth import require_admin
 from app.core.config import get_settings
 from app.schemas.admin import (
     PipelineRun,
@@ -11,22 +15,49 @@ from app.schemas.admin import (
 
 router = APIRouter(prefix="/admin", tags=["admin"])
 settings = get_settings()
+_ACTIVE_STATES = {"queued", "scheduled", "running", "up_for_retry"}
 
 
-def verify_admin(x_api_key: str = Header()) -> None:
-    if x_api_key != settings.admin_api_key:
-        raise HTTPException(status_code=403, detail="Invalid API key")
-
-
-def _airflow_client() -> httpx.Client:
-    return httpx.Client(
+@contextmanager
+def _airflow_client() -> Iterator[httpx.Client]:
+    client = httpx.Client(
         base_url=settings.airflow_base_url,
-        auth=(settings.airflow_user, settings.airflow_password),
         timeout=10.0,
     )
+    try:
+        token_response = client.post(
+            "/auth/token",
+            json={
+                "username": settings.airflow_user,
+                "password": settings.airflow_password,
+            },
+        )
+    except httpx.HTTPError as exc:
+        raise HTTPException(status_code=502, detail=f"Airflow connection error: {exc}") from exc
+
+    if not token_response.is_success:
+        detail = token_response.text[:500]
+        raise HTTPException(
+            status_code=502,
+            detail=f"Airflow authentication failed ({token_response.status_code}): {detail}",
+        )
+
+    access_token = token_response.json().get("access_token")
+    if not access_token:
+        raise HTTPException(status_code=502, detail="Airflow did not return an access token")
+
+    client.headers["Authorization"] = f"Bearer {access_token}"
+    try:
+        yield client
+    finally:
+        client.close()
 
 
-@router.post("/pipeline/trigger", response_model=PipelineTriggerResponse, dependencies=[Depends(verify_admin)])
+@router.post(
+    "/pipeline/trigger",
+    response_model=PipelineTriggerResponse,
+    dependencies=[Depends(require_admin)],
+)
 def trigger_pipeline() -> PipelineTriggerResponse:
     with _airflow_client() as client:
         resp = client.post(
@@ -38,8 +69,8 @@ def trigger_pipeline() -> PipelineTriggerResponse:
         data = resp.json()
         return PipelineTriggerResponse(
             dag_run_id=data["dag_run_id"],
-            state=data["state"],
-            logical_date=data.get("logical_date", ""),
+            state=data.get("state") or "queued",
+            logical_date=data.get("logical_date") or "",
         )
 
 
@@ -53,28 +84,34 @@ def _fetch_tasks(client: httpx.Client, dag_run_id: str) -> list[TaskStatus]:
     return [
         TaskStatus(
             task_id=t["task_id"],
-            state=t.get("state", "unknown"),
+            state=t.get("state") or "unknown",
             duration=t.get("duration"),
         )
         for t in tasks
     ]
 
 
-@router.get("/pipeline/status", response_model=PipelineStatusResponse, dependencies=[Depends(verify_admin)])
+@router.get(
+    "/pipeline/status",
+    response_model=PipelineStatusResponse,
+    dependencies=[Depends(require_admin)],
+)
 def pipeline_status() -> PipelineStatusResponse:
     with _airflow_client() as client:
         resp = client.get(
             "/api/v2/dags/news_event_pipeline/dagRuns",
-            params={"order_by": "-start_date", "limit": 5},
+            params={"order_by": "-start_date", "limit": 20},
         )
         if not resp.is_success:
             raise HTTPException(status_code=502, detail=f"Airflow error: {resp.text}")
 
         runs_data = resp.json().get("dag_runs", [])
+        runs_data.sort(key=lambda run: run.get("start_date") or "", reverse=True)
+        runs_data.sort(key=lambda run: run.get("state") not in _ACTIVE_STATES)
         runs = [
             PipelineRun(
                 dag_run_id=r["dag_run_id"],
-                state=r["state"],
+                state=r.get("state") or "unknown",
                 start_date=r.get("start_date"),
                 end_date=r.get("end_date"),
                 tasks=_fetch_tasks(client, r["dag_run_id"]),
@@ -84,7 +121,11 @@ def pipeline_status() -> PipelineStatusResponse:
         return PipelineStatusResponse(runs=runs)
 
 
-@router.get("/pipeline/history", response_model=PipelineStatusResponse, dependencies=[Depends(verify_admin)])
+@router.get(
+    "/pipeline/history",
+    response_model=PipelineStatusResponse,
+    dependencies=[Depends(require_admin)],
+)
 def pipeline_history(
     limit: int = Query(default=20, ge=1, le=50),
 ) -> PipelineStatusResponse:

@@ -7,9 +7,11 @@ type Props = { searchParams: Record<string, string | undefined> };
 
 export default async function ArticlesPage({ searchParams }: Props) {
   const source = searchParams.source;
+  const biasLabel = searchParams.bias_label;
   const page = Number(searchParams.page ?? "1") || 1;
   const result = await getArticles({
     ...(source ? { source } : {}),
+    ...(biasLabel ? { bias_label: biasLabel } : {}),
     page: String(page),
   });
   const totalPages = Math.ceil(result.total / result.page_size);
@@ -17,6 +19,7 @@ export default async function ArticlesPage({ searchParams }: Props) {
   const pageUrl = (nextPage: number) => {
     const query = new URLSearchParams();
     if (source) query.set("source", source);
+    if (biasLabel) query.set("bias_label", biasLabel);
     query.set("page", String(nextPage));
     return `/articles?${query.toString()}`;
   };
@@ -32,7 +35,11 @@ export default async function ArticlesPage({ searchParams }: Props) {
           Raw scraped news
         </p>
         <h1 className="mt-2 font-serif text-[28px] font-semibold">
-          {source ? `${source} articles` : "All articles"}
+          {biasLabel
+            ? `${biasLabel.replaceAll("_", " ")} articles`
+            : source
+              ? `${source} articles`
+              : "All articles"}
         </h1>
         <p className="mt-2 text-[14px] text-ink-dim">
           These are individual articles collected before event clustering.

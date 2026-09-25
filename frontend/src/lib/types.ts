@@ -14,6 +14,7 @@ export type EventSummary = {
   representative_title: string;
   sources: string[];
   bias_distribution: BiasDistribution;
+  image_url: string | null;
 };
 
 export type EventList = {

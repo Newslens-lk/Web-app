@@ -3,6 +3,7 @@ import type { EventSummary } from "@/lib/types";
 import { relativeTime } from "@/lib/api";
 import { BIAS_COLORS, BIAS_DISPLAY, BIAS_LABELS } from "@/lib/constants";
 import { SourceBadge } from "./SourceBadge";
+import { ArticleImage } from "./ArticleImage";
 
 type Props = { event: EventSummary };
 
@@ -12,6 +13,11 @@ export function EventCard({ event }: Props) {
       href={`/events/${event.event_id}`}
       className="group bg-surface border border-rule rounded-[10px] p-[18px] flex flex-col gap-2.5 text-left transition-shadow transition-colors hover:border-rule-strong hover:shadow-card"
     >
+      <ArticleImage
+        src={event.image_url}
+        alt={event.representative_title}
+        className="h-40 w-full rounded-md object-cover"
+      />
       {event.topic && (
         <span className="text-[11px] font-bold tracking-[0.09em] uppercase text-amber">
           {event.topic}

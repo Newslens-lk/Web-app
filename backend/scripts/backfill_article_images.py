@@ -54,7 +54,11 @@ def main() -> None:
         timeout=8,
         headers={"User-Agent": "NewsLens image metadata fetcher/1.0"},
     ) as client:
-        query = select(Article).where(Article.image_url.is_(None))
+        query = (
+            select(Article)
+            .where(Article.image_url.is_(None))
+            .order_by(Article.published_at.desc().nullslast())
+        )
         if args.source:
             query = query.where(Article.source_name == args.source)
         query = query.limit(args.limit)

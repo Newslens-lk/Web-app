@@ -75,8 +75,8 @@ def list_events(
                 event_id=event.event_id,
                 summary=event.summary,
                 topic=event.topic,
-                article_count=event.article_count,
-                source_count=event.source_count,
+                article_count=len(rows),
+                source_count=len(sources_list),
                 window_start=event.window_start,
                 window_end=event.window_end,
                 created_at=event.created_at,
@@ -101,13 +101,14 @@ def get_event(event_id: UUID, db: Session = Depends(get_db)) -> EventDetail:
             .order_by(Article.published_at.desc().nullslast())
         )
     )
+    source_count = len({article.source_name for article in articles})
 
     return EventDetail(
         event_id=event.event_id,
         summary=event.summary,
         topic=event.topic,
-        article_count=event.article_count,
-        source_count=event.source_count,
+        article_count=len(articles),
+        source_count=source_count,
         window_start=event.window_start,
         window_end=event.window_end,
         articles=[ArticleInEvent.model_validate(a) for a in articles],

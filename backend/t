@@ -1,0 +1,66 @@
+The mental model
+Git tracks snapshots of your project over time. Three areas matter day to day:
+
+
+working directory  →  staging area  →  local repo (commits)  →  remote (GitHub)
+   (your files)         (git add)         (git commit)           (git push)
+Everyday commands
+Check what's changed
+
+
+git status          # what's modified/staged/untracked
+git diff             # unstaged changes, line by line
+git diff --staged    # staged changes, line by line
+Stage and commit
+
+
+git add path/to/file.py     # stage one file
+git add -A                  # stage everything (new, modified, deleted)
+git commit -m "fix: handle null published_at in article list"
+A good commit message is short, present/imperative tense ("fix", "add", not "fixed"/"added"), and describes why if it's not obvious from the diff.
+
+See history
+
+
+git log --oneline --graph --all   # compact, visual
+git show <commit-hash>            # full diff of one commit
+git log -p -- path/to/file.py     # history of just one file
+Branching — the part that matters most for not breaking master
+Your repo's convention already says "branch first" before committing on top of master. Standard flow:
+
+
+git checkout -b feature/article-search      # create + switch to a new branch
+# ... make changes, commit as above ...
+git push -u origin feature/article-search   # push it, set upstream tracking
+Then open a PR (gh pr create) rather than merging master directly. Once merged on GitHub:
+
+
+git checkout master
+git pull                                    # get the merged changes
+git branch -d feature/article-search        # delete the now-merged local branch
+Syncing with the remote
+
+git pull            # fetch + merge remote changes into current branch
+git fetch           # just download, don't merge yet (safer to inspect first)
+git push            # upload your local commits
+Undoing things (safe → destructive)
+
+git restore path/to/file.py          # discard unstaged changes to one file
+git restore --staged path/to/file.py # unstage (keep the edits)
+git commit --amend                   # fix the message/content of your last commit (only if not pushed/shared)
+git revert <hash>                    # make a new commit that undoes an old one (safe on shared branches)
+git reset --hard <hash>              # rewind branch + working dir to that commit — DESTRUCTIVE, loses uncommitted work
+revert vs reset: revert is safe to use on a branch others are also working on (history stays intact, just adds an undo commit); reset --hard rewrites/destroys history and should only be used on local, unpushed work.
+
+Stashing — parking half-done work temporarily
+
+git stash            # shelve uncommitted changes
+git stash pop        # bring them back
+Useful when you need to switch branches but aren't ready to commit yet.
+
+Inspecting a specific file's history (relevant to what you've been reading)
+Since you've been reading through articles.py, admin.py, etc.:
+
+
+git log --follow -- backend/app/api/articles.py    # full history even across renames
+git blame backend/app/api/articles.py               # who/when changed each line

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { getStats } from "@/lib/api";
 import { BIAS_DISPLAY, BIAS_COLORS, SOURCE_DISPLAY } from "@/lib/constants";
 import type { BiasLabel } from "@/lib/types";
@@ -46,7 +47,11 @@ export default async function AnalyticsPage() {
           <h2 className="text-[15px] font-semibold mb-4">Bias Distribution</h2>
           <div className="flex flex-col gap-2.5">
             {biasEntries.map(([label, count]) => (
-              <div key={label} className="flex items-center gap-2 text-[13px]">
+              <Link
+                key={label}
+                href={`/articles?bias_label=${encodeURIComponent(label)}`}
+                className="flex items-center gap-2 rounded px-1 text-[13px] hover:bg-surface-2"
+              >
                 <span className="w-20 text-right text-ink-dim">
                   {BIAS_DISPLAY[label as BiasLabel] ?? label}
                 </span>
@@ -63,7 +68,7 @@ export default async function AnalyticsPage() {
                 <span className="font-mono text-[12px] w-12 text-right tabular-nums">
                   {count}
                 </span>
-              </div>
+              </Link>
             ))}
           </div>
         </div>

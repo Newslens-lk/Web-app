@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { FormEvent, useState } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 import { loginUser, registerUser } from "@/lib/api";
 
@@ -10,6 +10,8 @@ type Mode = "login" | "register";
 
 export default function LoginPage() {
   const router = useRouter();
+  const pathname = usePathname();
+  const isAdminLogin = pathname.startsWith("/admin/login");
   const [mode, setMode] = useState<Mode>("login");
   const [email, setEmail] = useState("");
   const [displayName, setDisplayName] = useState("");
@@ -23,12 +25,12 @@ export default function LoginPage() {
     setError(null);
 
     try {
-      if (mode === "register") {
+      if (mode === "register" && !isAdminLogin) {
         await registerUser({ email, display_name: displayName, password });
       } else {
         await loginUser({ email, password });
       }
-      router.push("/");
+      router.push(isAdminLogin ? "/admin" : "/");
       router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong");
@@ -43,19 +45,21 @@ export default function LoginPage() {
     <div className="mx-auto max-w-md py-8 sm:py-14">
       <div className="mb-7">
         <p className="text-[12px] font-semibold uppercase tracking-[0.18em] text-amber">
-          NewsLens account
+          {isAdminLogin ? "NewsLens administration" : "NewsLens account"}
         </p>
         <h1 className="mt-2 font-serif text-[30px] font-semibold">
-          {isRegistering ? "Create your account" : "Welcome back"}
+          {isAdminLogin ? "Admin login" : isRegistering ? "Create your account" : "Welcome back"}
         </h1>
         <p className="mt-2 text-[14px] text-ink-dim">
-          {isRegistering
+          {isAdminLogin
+            ? "Sign in with the administrator credentials configured for NewsLens."
+            : isRegistering
             ? "Create a regular user account to personalize your NewsLens experience."
             : "Sign in to continue to NewsLens."}
         </p>
       </div>
 
-      <div className="mb-5 flex rounded-lg border border-rule bg-surface-2 p-1">
+      {!isAdminLogin && <div className="mb-5 flex rounded-lg border border-rule bg-surface-2 p-1">
         {(["login", "register"] as Mode[]).map((option) => (
           <button
             key={option}
@@ -71,7 +75,7 @@ export default function LoginPage() {
             {option === "login" ? "Log in" : "Create account"}
           </button>
         ))}
-      </div>
+      </div>}
 
       <form onSubmit={handleSubmit} className="rounded-lg border border-rule bg-surface p-5 shadow-sm">
         {error && (
@@ -126,8 +130,8 @@ export default function LoginPage() {
         </button>
       </form>
 
-      <Link href="/" className="mt-5 block text-center text-[13px] font-semibold text-brand hover:underline">
-        Continue browsing without an account
+      <Link href={isAdminLogin ? "/login" : "/"} className="mt-5 block text-center text-[13px] font-semibold text-brand hover:underline">
+        {isAdminLogin ? "Regular user login" : "Continue browsing without an account"}
       </Link>
     </div>
   );

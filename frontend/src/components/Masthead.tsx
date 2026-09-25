@@ -12,9 +12,6 @@ export function Masthead() {
           <span>news</span>
           <span className="text-amber italic">Lens</span>
         </Link>
-        <span className="hidden md:inline text-[11.5px] text-ink-faint tracking-wide ml-1 pl-3 border-l border-rule-strong">
-          ප්‍රධාන පුවත් සංසන්දනය කරන්න — compare Sinhala news coverage
-        </span>
         <Nav />
       </div>
     </header>

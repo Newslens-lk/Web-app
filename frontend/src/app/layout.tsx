@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { Masthead } from "@/components/Masthead";
-import { DisclaimerBar } from "@/components/DisclaimerBar";
 import { Footer } from "@/components/Footer";
 
 export const metadata: Metadata = {
@@ -17,7 +16,6 @@ export default function RootLayout({
     <html lang="si">
       <body className="bg-bg text-ink font-sans text-[15px] leading-relaxed">
         <Masthead />
-        <DisclaimerBar />
         <main className="mx-auto max-w-shell px-4 sm:px-6 py-8 pb-20">
           {children}
         </main>

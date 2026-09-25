@@ -24,8 +24,8 @@ export default function AdminPage() {
         getPipelineStatus(),
         getPipelineHistory(),
       ]);
-      setRuns(status.runs);
-      setHistory(hist.runs);
+      setRuns(status.runs ?? []);
+      setHistory(hist.runs ?? []);
       setError(null);
     } catch {
       setError("Failed to load pipeline data.");
@@ -65,7 +65,7 @@ export default function AdminPage() {
       <div className="max-w-sm py-12">
         <h1 className="font-serif text-[24px] font-semibold mb-4">Admin Panel</h1>
         <button
-          onClick={() => (window.location.href = "/login")}
+          onClick={() => (window.location.href = "/admin/login")}
           className="bg-brand text-white px-4 py-2 rounded-md text-[14px] font-semibold hover:opacity-90"
         >
           Admin login
@@ -91,11 +91,11 @@ export default function AdminPage() {
           <h2 className="text-[15px] font-semibold mb-2">Pipeline Status</h2>
           <p className="text-[13px] text-ink-dim">
             Last run: {latest.start_date ? new Date(latest.start_date).toLocaleString() : "unknown"}{" "}
-            — {STATE_ICON[latest.state] ?? ""} {latest.state.toUpperCase()}
+            — {STATE_ICON[latest.state] ?? ""} {(latest.state ?? "unknown").toUpperCase()}
           </p>
-          {latest.tasks.length > 0 && (
+          {(latest.tasks ?? []).length > 0 && (
             <div className="flex flex-wrap gap-2 mt-3">
-              {latest.tasks.map((t) => (
+              {(latest.tasks ?? []).map((t) => (
                 <span
                   key={t.task_id}
                   className="bg-surface-2 border border-rule rounded px-2 py-1 text-[12px]"

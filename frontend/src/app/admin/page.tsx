@@ -9,6 +9,9 @@ const STATE_ICON: Record<string, string> = {
   failed: "\u274c",
   running: "\u23f3",
   queued: "\u23f3",
+  scheduled: "\u23f3",
+  up_for_retry: "\u26a0\ufe0f",
+  unknown: "\u2026",
 };
 
 export default function AdminPage() {
@@ -17,6 +20,7 @@ export default function AdminPage() {
   const [history, setHistory] = useState<PipelineRun[]>([]);
   const [triggering, setTriggering] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
 
   const load = useCallback(async () => {
     try {
@@ -26,6 +30,7 @@ export default function AdminPage() {
       ]);
       setRuns(status.runs ?? []);
       setHistory(hist.runs ?? []);
+      setLastUpdated(new Date());
       setError(null);
     } catch {
       setError("Failed to load pipeline data.");
@@ -42,7 +47,10 @@ export default function AdminPage() {
   }, []);
 
   useEffect(() => {
-    if (authed) load();
+    if (!authed) return;
+    load();
+    const timer = window.setInterval(load, 5000);
+    return () => window.clearInterval(timer);
   }, [authed, load]);
 
   async function handleTrigger() {
@@ -75,6 +83,10 @@ export default function AdminPage() {
   }
 
   const latest = runs[0];
+  const latestState = latest?.state ?? "unknown";
+  const isActive = ["queued", "scheduled", "running", "up_for_retry"].includes(latestState);
+  const completedTasks = latest?.tasks?.filter((task) => task.state === "success").length ?? 0;
+  const taskCount = latest?.tasks?.length ?? 0;
 
   return (
     <div>
@@ -86,16 +98,34 @@ export default function AdminPage() {
         </div>
       )}
 
-      {latest && (
-        <div className="bg-surface border border-rule rounded-lg p-5 mb-6">
-          <h2 className="text-[15px] font-semibold mb-2">Pipeline Status</h2>
-          <p className="text-[13px] text-ink-dim">
-            Last run: {latest.start_date ? new Date(latest.start_date).toLocaleString() : "unknown"}{" "}
-            — {STATE_ICON[latest.state] ?? ""} {(latest.state ?? "unknown").toUpperCase()}
-          </p>
-          {(latest.tasks ?? []).length > 0 && (
-            <div className="flex flex-wrap gap-2 mt-3">
-              {(latest.tasks ?? []).map((t) => (
+      <div className="bg-surface border border-rule rounded-lg p-5 mb-6">
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <h2 className="text-[15px] font-semibold mb-2">Current Pipeline State</h2>
+            {latest ? (
+              <>
+                <p className="text-[13px] text-ink-dim">
+                  {STATE_ICON[latestState] ?? ""} {latestState.toUpperCase()}
+                  {taskCount > 0 && ` — ${completedTasks}/${taskCount} tasks complete`}
+                </p>
+                <p className="mt-1 text-[12px] text-ink-faint font-mono break-all">
+                  {latest.dag_run_id}
+                </p>
+              </>
+            ) : (
+              <p className="text-[13px] text-ink-dim">No pipeline runs found.</p>
+            )}
+          </div>
+          {lastUpdated && (
+            <span className="text-[11px] text-ink-faint whitespace-nowrap">
+              Updated {lastUpdated.toLocaleTimeString()}
+            </span>
+          )}
+        </div>
+
+        {latest && (latest.tasks ?? []).length > 0 && (
+          <div className="flex flex-wrap gap-2 mt-4">
+            {(latest.tasks ?? []).map((t) => (
                 <span
                   key={t.task_id}
                   className="bg-surface-2 border border-rule rounded px-2 py-1 text-[12px]"
@@ -107,18 +137,17 @@ export default function AdminPage() {
                     </span>
                   )}
                 </span>
-              ))}
-            </div>
-          )}
-        </div>
-      )}
+            ))}
+          </div>
+        )}
+      </div>
 
       <button
         onClick={handleTrigger}
-        disabled={triggering}
+        disabled={triggering || isActive}
         className="bg-brand text-white px-5 py-2.5 rounded-md text-[14px] font-semibold hover:opacity-90 disabled:opacity-50 mb-8"
       >
-        {triggering ? "Triggering…" : "\u25b6 Trigger Pipeline Run"}
+        {triggering ? "Triggering…" : isActive ? "Pipeline in progress…" : "\u25b6 Trigger Pipeline Run"}
       </button>
 
       <h2 className="text-[15px] font-semibold mb-3">Recent Runs</h2>

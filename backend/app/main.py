@@ -27,6 +27,12 @@ def create_auth_tables() -> None:
     # The project does not yet have a migration system. Only the new auth table
     # is created here; existing pipeline tables are left untouched.
     User.__table__.create(bind=engine, checkfirst=True)
+    # Article records are owned by the pipeline database. Add this nullable
+    # column without changing or replacing the existing table.
+    from sqlalchemy import text
+
+    with engine.begin() as connection:
+        connection.execute(text("ALTER TABLE articles ADD COLUMN IF NOT EXISTS image_url TEXT"))
     if settings.admin_email and settings.admin_password:
         from sqlalchemy import select
 

@@ -11,6 +11,7 @@ class ArticleSummary(BaseModel):
     source_name: str
     url: str
     title: str
+    image_url: str | None = None
     body_excerpt: str | None
     published_at: datetime | None
     bias_label: str | None
@@ -25,6 +26,7 @@ class ArticleDetail(BaseModel):
     source_name: str
     url: str
     title: str
+    image_url: str | None = None
     body: str
     language: str
     published_at: datetime | None
@@ -42,6 +44,7 @@ class ArticleInEvent(BaseModel):
     source_name: str
     url: str
     title: str
+    image_url: str | None = None
     body: str
     published_at: datetime | None
     bias_label: str | None

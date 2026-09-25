@@ -13,6 +13,8 @@ export type EventSummary = {
   created_at: string;
   representative_title: string;
   sources: string[];
+  bias_distribution: BiasDistribution;
+  image_url: string | null;
 };
 
 export type EventList = {
@@ -27,6 +29,7 @@ export type ArticleInEvent = {
   source_name: string;
   url: string;
   title: string;
+  image_url: string | null;
   body: string;
   published_at: string | null;
   bias_label: BiasLabel | null;
@@ -51,6 +54,7 @@ export type ArticleSummary = {
   source_name: string;
   url: string;
   title: string;
+  image_url: string | null;
   body_excerpt: string | null;
   published_at: string | null;
   bias_label: BiasLabel | null;
@@ -63,6 +67,7 @@ export type ArticleDetail = {
   source_name: string;
   url: string;
   title: string;
+  image_url: string | null;
   body: string;
   language: string;
   published_at: string | null;

@@ -29,6 +29,8 @@ class EventSummary(BaseModel):
     created_at: datetime
     representative_title: str
     sources: list[str]
+    bias_distribution: BiasDistribution
+    image_url: str | None = None
 
 
 class EventList(BaseModel):

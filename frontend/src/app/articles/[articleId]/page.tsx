@@ -4,6 +4,7 @@ import { getArticleDetail, getSimilarArticles, relativeTime } from "@/lib/api";
 import { BiasLabel } from "@/components/BiasLabel";
 import { SourceBadge } from "@/components/SourceBadge";
 import { BIAS_LABELS, BIAS_DISPLAY, BIAS_COLORS } from "@/lib/constants";
+import { ArticleImage } from "@/components/ArticleImage";
 
 type Props = { params: { articleId: string } };
 
@@ -56,6 +57,12 @@ export default async function ArticleDetailPage({ params }: Props) {
           Read Original &nearr;
         </a>
       </p>
+
+      <ArticleImage
+        src={article.image_url}
+        alt={article.title}
+        className="mt-6 max-h-[420px] w-full rounded-lg object-cover"
+      />
 
       {article.bias_scores && (
         <div className="mt-6 bg-surface border border-rule rounded-lg p-4">

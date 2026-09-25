@@ -54,13 +54,15 @@ def list_articles(
     articles = list(db.scalars(stmt))
     summaries = []
     for article in articles:
-        excerpt = " ".join(article.body.split())[:320] if article.body else None
+        body = getattr(article, "body", "")
+        excerpt = " ".join(body.split())[:320] if body else None
         summaries.append(
             ArticleSummary(
                 article_id=article.article_id,
                 source_name=article.source_name,
                 url=article.url,
                 title=article.title,
+                image_url=getattr(article, "image_url", None),
                 body_excerpt=excerpt,
                 published_at=article.published_at,
                 bias_label=article.bias_label,

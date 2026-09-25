@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 import { getArticles, relativeTime } from "@/lib/api";
-import { SourceBadge } from "@/components/SourceBadge";
+import { BiasLabel } from "@/components/BiasLabel";
 
 type Props = { searchParams: Record<string, string | undefined> };
 
@@ -43,16 +43,17 @@ export default async function ArticlesPage({ searchParams }: Props) {
         {result.articles.map((article) => (
           <article key={article.article_id} className="rounded-lg border border-rule bg-surface p-4">
             <div className="flex flex-wrap items-center gap-2">
-              <SourceBadge name={article.source_name} />
-              {article.bias_label && (
-                <span className="text-[12px] font-semibold text-ink-dim">
-                  {article.bias_label.replaceAll("_", " ")}
-                </span>
-              )}
+              <BiasLabel label={article.bias_label} confidence={article.bias_confidence} />
             </div>
             <h2 className="mt-2 font-serif text-[18px] font-semibold leading-snug">
               {article.title}
             </h2>
+            {article.body_excerpt && (
+              <p className="mt-2 text-[14px] leading-relaxed text-ink-dim">
+                {article.body_excerpt}
+                {article.body_excerpt.length >= 320 ? "…" : ""}
+              </p>
+            )}
             <p className="mt-2 text-[13px] text-ink-dim">
               {relativeTime(article.published_at)}
             </p>

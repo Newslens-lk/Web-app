@@ -51,6 +51,7 @@ export type ArticleSummary = {
   source_name: string;
   url: string;
   title: string;
+  body_excerpt: string | null;
   published_at: string | null;
   bias_label: BiasLabel | null;
   bias_confidence: number | null;

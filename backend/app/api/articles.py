@@ -52,8 +52,25 @@ def list_articles(
     stmt = stmt.limit(page_size).offset((page - 1) * page_size)
 
     articles = list(db.scalars(stmt))
+    summaries = []
+    for article in articles:
+        excerpt = " ".join(article.body.split())[:320] if article.body else None
+        summaries.append(
+            ArticleSummary(
+                article_id=article.article_id,
+                source_name=article.source_name,
+                url=article.url,
+                title=article.title,
+                body_excerpt=excerpt,
+                published_at=article.published_at,
+                bias_label=article.bias_label,
+                bias_confidence=article.bias_confidence,
+                event_id=article.event_id,
+            )
+        )
+
     return ArticleList(
-        articles=[ArticleSummary.model_validate(a) for a in articles],
+        articles=summaries,
         total=total or 0,
         page=page,
         page_size=page_size,

@@ -15,6 +15,7 @@ from app.schemas.admin import (
 
 router = APIRouter(prefix="/admin", tags=["admin"])
 settings = get_settings()
+_ACTIVE_STATES = {"queued", "scheduled", "running", "up_for_retry"}
 
 
 @contextmanager
@@ -99,16 +100,18 @@ def pipeline_status() -> PipelineStatusResponse:
     with _airflow_client() as client:
         resp = client.get(
             "/api/v2/dags/news_event_pipeline/dagRuns",
-            params={"order_by": "-start_date", "limit": 5},
+            params={"order_by": "-start_date", "limit": 20},
         )
         if not resp.is_success:
             raise HTTPException(status_code=502, detail=f"Airflow error: {resp.text}")
 
         runs_data = resp.json().get("dag_runs", [])
+        runs_data.sort(key=lambda run: run.get("start_date") or "", reverse=True)
+        runs_data.sort(key=lambda run: run.get("state") not in _ACTIVE_STATES)
         runs = [
             PipelineRun(
                 dag_run_id=r["dag_run_id"],
-                state=r["state"],
+                state=r.get("state") or "unknown",
                 start_date=r.get("start_date"),
                 end_date=r.get("end_date"),
                 tasks=_fetch_tasks(client, r["dag_run_id"]),

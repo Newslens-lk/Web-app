@@ -30,6 +30,12 @@
   --font-mono: ui-monospace, "SF Mono", "Cascadia Code", Consolas, monospace;
 }
 
+/* Dark palette.
+   Declared twice on purpose so the toggle wins in both directions:
+   - the media block covers "OS is dark and the reader has not chosen light"
+   - the [data-theme="dark"] block covers an explicit choice of dark, even
+     while the OS is set to light.
+   Keep the two token lists in sync when editing. */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --bg: #14171a;
@@ -46,7 +52,38 @@
     --brand-tint: #1e333a;
     --amber: #e3a55c;
     --amber-tint: #3a2e1c;
+
+    /* Lifted so the darkest buckets stay visible on a dark ground, while
+       staying mid-tone enough for the white text BiasLabel puts on them. */
+    --bias-far-left: #e5484d;
+    --bias-left: #ee6b1f;
+    --bias-center: #7a8288;
+    --bias-right: #3b82f6;
+    --bias-far-right: #4f63c4;
   }
+}
+
+:root[data-theme="dark"] {
+  --bg: #14171a;
+  --surface: #1b1f23;
+  --surface-2: #23282d;
+  --surface-3: #2b3137;
+  --ink: #eceae3;
+  --ink-dim: #a7adb0;
+  --ink-faint: #767c80;
+  --rule: #32383e;
+  --rule-strong: #3d444b;
+  --brand: #7fb2c2;
+  --brand-ink: #cfe6ec;
+  --brand-tint: #1e333a;
+  --amber: #e3a55c;
+  --amber-tint: #3a2e1c;
+
+  --bias-far-left: #e5484d;
+  --bias-left: #ee6b1f;
+  --bias-center: #7a8288;
+  --bias-right: #3b82f6;
+  --bias-far-right: #4f63c4;
 }
 
 html,

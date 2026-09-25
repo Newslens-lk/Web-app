@@ -11,7 +11,6 @@ const links = [
   { href: "/", label: "Home" },
   { href: "/sources", label: "Sources" },
   { href: "/analytics", label: "Analytics" },
-  { href: "/admin", label: "Admin" },
 ];
 
 export function Nav() {
@@ -29,7 +28,9 @@ export function Nav() {
 
   return (
     <nav aria-label="Primary" className="ml-auto flex flex-wrap gap-1">
-      {links.map((link) => {
+      {[...links, ...(user
+        ? [{ href: user.role === "admin" ? "/admin" : "/account", label: user.role === "admin" ? "Admin" : "Account" }]
+        : [])].map((link) => {
         const active =
           link.href === "/"
             ? pathname === "/"

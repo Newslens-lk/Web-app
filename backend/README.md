@@ -99,3 +99,23 @@ app/
 pip install -r requirements-dev.txt
 pytest --cov=app
 ```
+
+## Article image repair
+
+Image backfilling rejects known publisher placeholders and validates actual image
+dimensions (at least 320 × 160). Lankadeepa article-body photos take priority over
+its unreliable Open Graph image. Ads and related-story images are not fallbacks.
+
+Run from the backend directory or inside the backend container:
+
+```bash
+python -m scripts.backfill_article_images --source lankadeepa --limit 100
+python -m scripts.backfill_article_images --source lankadeepa --replace-url "BAD_IMAGE_URL" --dry-run
+python -m scripts.backfill_article_images --source lankadeepa --replace-url "BAD_IMAGE_URL" --backup image-repair.json
+```
+
+The default processes only missing images; `--replace-url` targets existing records
+with exactly that URL. Repairs write a JSON backup of old and new values before
+committing. If an article page cannot be fetched, its stored value is preserved.
+If it loads but has no suitable photo, the image is cleared and the UI shows
+“No image available.” Copy backups out of a container before recreating it.

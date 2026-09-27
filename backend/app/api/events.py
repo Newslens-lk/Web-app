@@ -5,6 +5,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
+from app.core.article_images import usable_image_url
 from app.db.session import get_db
 from app.models.article import Article
 from app.models.event import Event
@@ -79,7 +80,10 @@ def list_events(
 
         rep_title = event.summary or (rows[0][0] if rows else "Untitled event")
         sources_list = sorted({r[1] for r in rows})
-        image_url = next((row[3] for row in rows if len(row) > 3 and row[3]), None)
+        image_url = next(
+            (url for row in rows if len(row) > 3 and (url := usable_image_url(row[3]))),
+            None,
+        )
 
         summaries.append(
             EventSummary(

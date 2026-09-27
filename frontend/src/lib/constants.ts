@@ -14,13 +14,8 @@ export const BIAS_COLORS: Record<BiasLabel, string> = {
 
 export const BIAS_LABELS: BiasLabel[] = ["far_left", "left", "center", "right", "far_right"];
 
-export const BIAS_DISPLAY: Record<BiasLabel, string> = {
-  far_left: "Far Left",
-  left: "Left",
-  center: "Center",
-  right: "Right",
-  far_right: "Far Right",
-};
+// Bias names are translated, so they live in lib/i18n/dictionaries.ts under
+// `bias` rather than here — read them as `t.bias[label]`.
 
 export const SOURCE_COLORS: Record<string, string> = {
   hirunews: "#FF6B00",

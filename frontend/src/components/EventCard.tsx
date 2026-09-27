@@ -1,13 +1,16 @@
 import Link from "next/link";
 import type { EventSummary } from "@/lib/types";
 import { relativeTime } from "@/lib/api";
-import { BIAS_COLORS, BIAS_DISPLAY, BIAS_LABELS } from "@/lib/constants";
+import { BIAS_COLORS, BIAS_LABELS } from "@/lib/constants";
+import { getDictionary } from "@/lib/i18n/server";
 import { SourceBadge } from "./SourceBadge";
 import { ArticleImage } from "./ArticleImage";
 
 type Props = { event: EventSummary };
 
 export function EventCard({ event }: Props) {
+  const t = getDictionary();
+
   return (
     <Link
       href={`/events/${event.event_id}`}
@@ -27,14 +30,18 @@ export function EventCard({ event }: Props) {
         {event.representative_title}
       </h3>
       <p className="text-[13px] text-ink-dim leading-snug">
-        {event.article_count} article{event.article_count !== 1 && "s"} · {event.source_count} source{event.source_count !== 1 && "s"} · {relativeTime(event.window_end)}
+        {t.home.eventMeta(
+          event.article_count,
+          event.source_count,
+          relativeTime(event.window_end, t),
+        )}
       </p>
       <div
         className="mt-1 flex h-2.5 w-full overflow-hidden rounded-full bg-surface-2"
         role="img"
-        aria-label="Bias distribution"
+        aria-label={t.common.biasDistribution}
         title={BIAS_LABELS
-          .map((label) => `${BIAS_DISPLAY[label]}: ${event.bias_distribution[label]}`)
+          .map((label) => `${t.bias[label]}: ${event.bias_distribution[label]}`)
           .join(" · ")}
       >
         {BIAS_LABELS.map((label) => {
@@ -56,7 +63,7 @@ export function EventCard({ event }: Props) {
         {BIAS_LABELS.map((label) => (
           <span key={label} className="inline-flex items-center gap-1">
             <span className="h-2 w-2 rounded-sm" style={{ backgroundColor: BIAS_COLORS[label] }} />
-            {BIAS_DISPLAY[label]} ({event.bias_distribution[label]})
+            {t.bias[label]} ({event.bias_distribution[label]})
           </span>
         ))}
       </div>

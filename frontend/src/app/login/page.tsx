@@ -5,12 +5,14 @@ import { FormEvent, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 
 import { loginUser, registerUser } from "@/lib/api";
+import { useI18n } from "@/lib/i18n/client";
 
 type Mode = "login" | "register";
 
 export default function LoginPage() {
   const router = useRouter();
   const pathname = usePathname();
+  const { t } = useI18n();
   const isAdminLogin = pathname.startsWith("/admin/login");
   const [mode, setMode] = useState<Mode>("login");
   const [email, setEmail] = useState("");
@@ -33,7 +35,7 @@ export default function LoginPage() {
       router.push(isAdminLogin ? "/admin" : "/");
       router.refresh();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong");
+      setError(err instanceof Error ? err.message : t.auth.genericError);
     } finally {
       setSubmitting(false);
     }
@@ -45,17 +47,21 @@ export default function LoginPage() {
     <div className="mx-auto max-w-md py-8 sm:py-14">
       <div className="mb-7">
         <p className="text-[12px] font-semibold uppercase tracking-[0.18em] text-amber">
-          {isAdminLogin ? "NewsLens administration" : "NewsLens account"}
+          {isAdminLogin ? t.auth.adminKicker : t.auth.accountKicker}
         </p>
         <h1 className="mt-2 font-serif text-[30px] font-semibold">
-          {isAdminLogin ? "Admin login" : isRegistering ? "Create your account" : "Welcome back"}
+          {isAdminLogin
+            ? t.auth.adminTitle
+            : isRegistering
+              ? t.auth.registerTitle
+              : t.auth.loginTitle}
         </h1>
         <p className="mt-2 text-[14px] text-ink-dim">
           {isAdminLogin
-            ? "Sign in with the administrator credentials configured for NewsLens."
+            ? t.auth.adminIntro
             : isRegistering
-            ? "Create a regular user account to personalize your NewsLens experience."
-            : "Sign in to continue to NewsLens."}
+              ? t.auth.registerIntro
+              : t.auth.loginIntro}
         </p>
       </div>
 
@@ -72,7 +78,7 @@ export default function LoginPage() {
               mode === option ? "bg-surface text-ink shadow-sm" : "text-ink-dim"
             }`}
           >
-            {option === "login" ? "Log in" : "Create account"}
+            {option === "login" ? t.auth.tabLogin : t.auth.tabRegister}
           </button>
         ))}
       </div>}
@@ -86,7 +92,7 @@ export default function LoginPage() {
 
         {isRegistering && (
           <label className="mb-4 block text-[13px] font-semibold">
-            Display name
+            {t.auth.displayName}
             <input
               required
               value={displayName}
@@ -97,7 +103,7 @@ export default function LoginPage() {
         )}
 
         <label className="mb-4 block text-[13px] font-semibold">
-          Email
+          {t.auth.email}
           <input
             required
             type="email"
@@ -109,7 +115,7 @@ export default function LoginPage() {
         </label>
 
         <label className="mb-5 block text-[13px] font-semibold">
-          Password
+          {t.auth.password}
           <input
             required
             minLength={8}
@@ -126,12 +132,16 @@ export default function LoginPage() {
           disabled={submitting}
           className="w-full rounded-md bg-brand px-4 py-2.5 text-[14px] font-semibold text-white hover:opacity-90 disabled:opacity-50"
         >
-          {submitting ? "Please wait…" : isRegistering ? "Create account" : "Log in"}
+          {submitting
+            ? t.auth.submitting
+            : isRegistering
+              ? t.auth.tabRegister
+              : t.auth.tabLogin}
         </button>
       </form>
 
       <Link href={isAdminLogin ? "/login" : "/"} className="mt-5 block text-center text-[13px] font-semibold text-brand hover:underline">
-        {isAdminLogin ? "Regular user login" : "Continue browsing without an account"}
+        {isAdminLogin ? t.auth.toUserLogin : t.auth.keepBrowsing}
       </Link>
     </div>
   );

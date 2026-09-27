@@ -3,12 +3,14 @@ import { notFound } from "next/navigation";
 import { getArticleDetail, getSimilarArticles, relativeTime } from "@/lib/api";
 import { BiasLabel } from "@/components/BiasLabel";
 import { SourceBadge } from "@/components/SourceBadge";
-import { BIAS_LABELS, BIAS_DISPLAY, BIAS_COLORS } from "@/lib/constants";
+import { BIAS_LABELS, BIAS_COLORS } from "@/lib/constants";
+import { getDictionary } from "@/lib/i18n/server";
 import { ArticleImage } from "@/components/ArticleImage";
 
 type Props = { params: { articleId: string } };
 
 export default async function ArticleDetailPage({ params }: Props) {
+  const t = getDictionary();
   let article;
   try {
     article = await getArticleDetail(params.articleId);
@@ -31,7 +33,7 @@ export default async function ArticleDetailPage({ params }: Props) {
           href={`/events/${article.event_id}`}
           className="inline-block text-[13.5px] font-semibold text-brand hover:underline mb-4"
         >
-          &larr; Back to Event
+          &larr; {t.article.backToEvent}
         </Link>
       )}
 
@@ -45,8 +47,11 @@ export default async function ArticleDetailPage({ params }: Props) {
       </h1>
 
       <p className="text-[13px] text-ink-faint mt-2">
-        Published {article.published_at ? relativeTime(article.published_at) : "date unknown"}
-        {article.scraped_at && <> · Scraped {relativeTime(article.scraped_at)}</>}
+        {t.article.published}{" "}
+        {article.published_at ? relativeTime(article.published_at, t) : t.common.dateUnknown}
+        {article.scraped_at && (
+          <> · {t.article.scraped} {relativeTime(article.scraped_at, t)}</>
+        )}
         {" · "}
         <a
           href={article.url}
@@ -54,7 +59,7 @@ export default async function ArticleDetailPage({ params }: Props) {
           rel="noreferrer"
           className="text-brand font-semibold hover:underline"
         >
-          Read Original &nearr;
+          {t.common.readOriginal} &nearr;
         </a>
       </p>
 
@@ -66,13 +71,13 @@ export default async function ArticleDetailPage({ params }: Props) {
 
       {article.bias_scores && (
         <div className="mt-6 bg-surface border border-rule rounded-lg p-4">
-          <h2 className="text-[13px] font-semibold text-ink-dim mb-3">Bias Score Breakdown</h2>
+          <h2 className="text-[13px] font-semibold text-ink-dim mb-3">{t.article.scoreBreakdown}</h2>
           <div className="flex flex-col gap-2">
             {BIAS_LABELS.map((label) => {
               const score = article.bias_scores![label] ?? 0;
               return (
                 <div key={label} className="flex items-center gap-2 text-[13px]">
-                  <span className="w-20 text-right text-ink-dim">{BIAS_DISPLAY[label]}</span>
+                  <span className="w-20 text-right text-ink-dim">{t.bias[label]}</span>
                   <div className="flex-1 h-5 bg-surface-2 rounded overflow-hidden">
                     <div
                       className="h-full rounded"
@@ -98,7 +103,7 @@ export default async function ArticleDetailPage({ params }: Props) {
 
       {similar.length > 0 && (
         <div className="mt-10">
-          <h2 className="text-[15px] font-semibold mb-4">Similar Articles</h2>
+          <h2 className="text-[15px] font-semibold mb-4">{t.article.similar}</h2>
           <div className="flex flex-col gap-3">
             {similar.map((s) => (
               <Link

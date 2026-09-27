@@ -3,7 +3,8 @@
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 
-import { BIAS_DISPLAY, BIAS_LABELS, SOURCE_DISPLAY } from "@/lib/constants";
+import { BIAS_LABELS, SOURCE_DISPLAY } from "@/lib/constants";
+import { useI18n } from "@/lib/i18n/client";
 
 type Props = {
   search?: string;
@@ -22,6 +23,7 @@ function inputDateValue(value?: string) {
 
 export function ArticleFilters({ search, source, biasLabel, dateFrom, dateTo }: Props) {
   const router = useRouter();
+  const { t } = useI18n();
   const [query, setQuery] = useState(search ?? "");
 
   function submit(event: FormEvent<HTMLFormElement>) {
@@ -53,21 +55,21 @@ export function ArticleFilters({ search, source, biasLabel, dateFrom, dateTo }: 
     <form onSubmit={submit} className="mb-6 rounded-lg border border-rule bg-surface-2 p-4">
       <div className="grid gap-3 md:grid-cols-[minmax(220px,1.5fr)_1fr_1fr]">
         <label className="flex flex-col gap-1.5 text-[12px] font-semibold text-ink-dim">
-          Search news
+          {t.filters.searchNews}
           <input
             name="search"
             type="search"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            placeholder="Search headlines or article text"
+            placeholder={t.filters.searchPlaceholder}
             className={inputClass}
           />
         </label>
 
         <label className="flex flex-col gap-1.5 text-[12px] font-semibold text-ink-dim">
-          Source
+          {t.filters.source}
           <select name="source" defaultValue={source ?? ""} className={inputClass}>
-            <option value="">All sources</option>
+            <option value="">{t.filters.allSources}</option>
             {Object.entries(SOURCE_DISPLAY).map(([value, label]) => (
               <option key={value} value={value}>{label}</option>
             ))}
@@ -75,11 +77,11 @@ export function ArticleFilters({ search, source, biasLabel, dateFrom, dateTo }: 
         </label>
 
         <label className="flex flex-col gap-1.5 text-[12px] font-semibold text-ink-dim">
-          Bias
+          {t.filters.bias}
           <select name="bias_label" defaultValue={biasLabel ?? ""} className={inputClass}>
-            <option value="">All bias labels</option>
+            <option value="">{t.filters.allBiasLabels}</option>
             {BIAS_LABELS.map((value) => (
-              <option key={value} value={value}>{BIAS_DISPLAY[value]}</option>
+              <option key={value} value={value}>{t.bias[value]}</option>
             ))}
           </select>
         </label>
@@ -87,19 +89,19 @@ export function ArticleFilters({ search, source, biasLabel, dateFrom, dateTo }: 
 
       <div className="mt-3 flex flex-wrap items-end gap-3">
         <label className="flex flex-col gap-1.5 text-[12px] font-semibold text-ink-dim">
-          From
+          {t.filters.from}
           <input name="date_from" type="date" defaultValue={inputDateValue(dateFrom)} className={inputClass} />
         </label>
         <label className="flex flex-col gap-1.5 text-[12px] font-semibold text-ink-dim">
-          To
+          {t.filters.to}
           <input name="date_to" type="date" defaultValue={inputDateValue(dateTo)} className={inputClass} />
         </label>
         <button type="submit" className="rounded-md bg-brand px-4 py-[10px] text-[13px] font-semibold text-white hover:opacity-90">
-          Apply filters
+          {t.filters.apply}
         </button>
         {(search || source || biasLabel || dateFrom || dateTo) && (
           <button type="button" onClick={clear} className="px-2 py-[10px] text-[13px] font-semibold text-ink-dim hover:text-ink">
-            Clear
+            {t.filters.clear}
           </button>
         )}
       </div>

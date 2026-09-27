@@ -6,16 +6,18 @@ import { useEffect, useState } from "react";
 
 import { getCurrentUser, logoutUser } from "@/lib/api";
 import type { User } from "@/lib/types";
-
-const links = [
-  { href: "/", label: "Home" },
-  { href: "/sources", label: "Sources" },
-  { href: "/analytics", label: "Analytics" },
-];
+import { useI18n } from "@/lib/i18n/client";
 
 export function Nav() {
   const pathname = usePathname() ?? "/";
+  const { t } = useI18n();
   const [user, setUser] = useState<User | null>(null);
+
+  const links = [
+    { href: "/", label: t.nav.home },
+    { href: "/sources", label: t.nav.sources },
+    { href: "/analytics", label: t.nav.analytics },
+  ];
 
   useEffect(() => {
     getCurrentUser().then(setUser).catch(() => setUser(null));
@@ -27,9 +29,9 @@ export function Nav() {
   }
 
   return (
-    <nav aria-label="Primary" className="ml-auto flex flex-wrap gap-1">
+    <nav aria-label={t.nav.label} className="ml-auto flex flex-wrap gap-1">
       {[...links, ...(user
-        ? [{ href: user.role === "admin" ? "/admin" : "/account", label: user.role === "admin" ? "Admin" : "Account" }]
+        ? [{ href: user.role === "admin" ? "/admin" : "/account", label: user.role === "admin" ? t.nav.admin : t.nav.account }]
         : [])].map((link) => {
         const active =
           link.href === "/"
@@ -57,14 +59,14 @@ export function Nav() {
           onClick={handleLogout}
           className="rounded-md border border-transparent px-3 py-2 text-[13.5px] font-semibold text-ink-dim hover:bg-surface-2 hover:text-ink"
         >
-          Log out
+          {t.nav.logOut}
         </button>
       ) : (
         <Link
           href="/login"
           className="rounded-md bg-brand px-3 py-2 text-[13.5px] font-semibold text-white hover:opacity-90"
         >
-          Log in
+          {t.nav.logIn}
         </Link>
       )}
     </nav>

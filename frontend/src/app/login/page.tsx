@@ -12,7 +12,7 @@ type Mode = "login" | "register";
 export default function LoginPage() {
   const router = useRouter();
   const pathname = usePathname();
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const isAdminLogin = pathname.startsWith("/admin/login");
   const [mode, setMode] = useState<Mode>("login");
   const [email, setEmail] = useState("");
@@ -28,7 +28,7 @@ export default function LoginPage() {
 
     try {
       if (mode === "register" && !isAdminLogin) {
-        await registerUser({ email, display_name: displayName, password });
+        await registerUser({ email, display_name: displayName, password, locale });
       } else {
         await loginUser({ email, password });
       }

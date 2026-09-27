@@ -1,5 +1,7 @@
 import Script from "next/script";
 
+import { getDictionary } from "@/lib/i18n/server";
+
 // Third-party embed — loads platform.js from elfsightcdn.com, which then
 // scans the DOM for `.elfsight-app-*` classes and injects the widget into
 // the matching div. `data-elfsight-app-lazy` defers the actual widget
@@ -15,10 +17,12 @@ import Script from "next/script";
 const ELFSIGHT_APP_ID = "dd8fcc7f-3b93-4799-868a-24f860a8da96";
 
 export function WeatherWidget() {
+  const t = getDictionary();
+
   return (
     <div className="bg-surface border border-rule rounded-[10px] p-5">
       <div className="text-xs font-bold uppercase tracking-wider text-ink-faint mb-3">
-        Weather
+        {t.widgets.weather}
       </div>
       <Script
         src="https://elfsightcdn.com/platform.js"

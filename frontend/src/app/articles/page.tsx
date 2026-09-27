@@ -4,10 +4,14 @@ import { getArticles, relativeTime } from "@/lib/api";
 import { BiasLabel } from "@/components/BiasLabel";
 import { ArticleFilters } from "@/components/ArticleFilters";
 import { ArticleImage } from "@/components/ArticleImage";
+import { sourceDisplayName } from "@/lib/constants";
+import { getDictionary } from "@/lib/i18n/server";
+import type { BiasLabel as BiasLabelType } from "@/lib/types";
 
 type Props = { searchParams: Record<string, string | undefined> };
 
 export default async function ArticlesPage({ searchParams }: Props) {
+  const t = getDictionary();
   const source = searchParams.source;
   const biasLabel = searchParams.bias_label;
   const search = searchParams.search;
@@ -38,23 +42,21 @@ export default async function ArticlesPage({ searchParams }: Props) {
   return (
     <div>
       <Link href="/sources" className="text-[13px] font-semibold text-brand hover:underline">
-        ← Back to Sources
+        ← {t.articles.backToSources}
       </Link>
 
       <div className="mt-5 mb-6">
         <p className="text-[12px] font-semibold uppercase tracking-[0.18em] text-amber">
-          Raw scraped news
+          {t.articles.kicker}
         </p>
         <h1 className="mt-2 font-serif text-[28px] font-semibold">
           {biasLabel
-            ? `${biasLabel.replaceAll("_", " ")} articles`
+            ? t.articles.filtered(t.bias[biasLabel as BiasLabelType] ?? biasLabel.replaceAll("_", " "))
             : source
-              ? `${source} articles`
-              : "All articles"}
+              ? t.articles.filtered(sourceDisplayName(source))
+              : t.articles.allArticles}
         </h1>
-        <p className="mt-2 text-[14px] text-ink-dim">
-          These are individual articles collected before event clustering.
-        </p>
+        <p className="mt-2 text-[14px] text-ink-dim">{t.articles.intro}</p>
       </div>
 
       <ArticleFilters
@@ -86,14 +88,14 @@ export default async function ArticlesPage({ searchParams }: Props) {
               </p>
             )}
             <p className="mt-2 text-[13px] text-ink-dim">
-              {relativeTime(article.published_at)}
+              {relativeTime(article.published_at, t)}
             </p>
             <div className="mt-3 flex gap-4 text-[13px] font-semibold">
               <Link href={`/articles/${article.article_id}`} className="text-brand hover:underline">
-                Details
+                {t.common.details}
               </Link>
               <a href={article.url} target="_blank" rel="noreferrer" className="text-brand hover:underline">
-                Read original ↗
+                {t.common.readOriginal} ↗
               </a>
             </div>
           </article>
@@ -101,25 +103,25 @@ export default async function ArticlesPage({ searchParams }: Props) {
       </div>
 
       {result.articles.length === 0 && (
-        <p className="py-12 text-center text-ink-dim">No raw articles found.</p>
+        <p className="py-12 text-center text-ink-dim">{t.articles.empty}</p>
       )}
 
       {totalPages > 1 && (
-        <nav aria-label="Article pages" className="mt-8 flex items-center justify-center gap-3 text-[13px]">
+        <nav aria-label={t.articles.pages} className="mt-8 flex items-center justify-center gap-3 text-[13px]">
           {page > 1 ? (
             <Link href={pageUrl(page - 1)} className="rounded-md border border-rule-strong bg-surface px-3 py-2 font-semibold text-ink-dim hover:bg-surface-2">
-              Previous
+              {t.common.previous}
             </Link>
           ) : (
-            <span className="rounded-md border border-rule bg-surface-2 px-3 py-2 text-ink-faint">Previous</span>
+            <span className="rounded-md border border-rule bg-surface-2 px-3 py-2 text-ink-faint">{t.common.previous}</span>
           )}
-          <span className="text-ink-dim">Page {page} of {totalPages}</span>
+          <span className="text-ink-dim">{t.common.pageOf(page, totalPages)}</span>
           {page < totalPages ? (
             <Link href={pageUrl(page + 1)} className="rounded-md border border-rule-strong bg-surface px-3 py-2 font-semibold text-ink-dim hover:bg-surface-2">
-              Next
+              {t.common.next}
             </Link>
           ) : (
-            <span className="rounded-md border border-rule bg-surface-2 px-3 py-2 text-ink-faint">Next</span>
+            <span className="rounded-md border border-rule bg-surface-2 px-3 py-2 text-ink-faint">{t.common.next}</span>
           )}
         </nav>
       )}

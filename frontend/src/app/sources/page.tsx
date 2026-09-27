@@ -2,13 +2,15 @@ import Link from "next/link";
 import { getSources } from "@/lib/api";
 import { SourceBadge } from "@/components/SourceBadge";
 import { relativeTime } from "@/lib/api";
+import { getDictionary } from "@/lib/i18n/server";
 
 export default async function SourcesPage() {
+  const t = getDictionary();
   const { sources } = await getSources();
 
   return (
     <div>
-      <h1 className="font-serif text-[24px] font-semibold mb-6">Sources</h1>
+      <h1 className="font-serif text-[24px] font-semibold mb-6">{t.sources.title}</h1>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {sources.map((source) => (
@@ -23,13 +25,13 @@ export default async function SourcesPage() {
                 <span className="font-mono tabular-nums font-semibold text-ink">
                   {source.article_count}
                 </span>{" "}
-                articles scraped
+                {t.sources.scraped}
               </p>
               <p className="mt-0.5">
-                Latest:{" "}
+                {t.sources.latest}{" "}
                 {source.latest_article_at
-                  ? relativeTime(source.latest_article_at)
-                  : "none yet"}
+                  ? relativeTime(source.latest_article_at, t)
+                  : t.sources.noneYet}
               </p>
             </div>
           </Link>
@@ -37,7 +39,7 @@ export default async function SourcesPage() {
       </div>
 
       {sources.length === 0 && (
-        <p className="text-ink-dim text-center py-12">No sources found.</p>
+        <p className="text-ink-dim text-center py-12">{t.sources.empty}</p>
       )}
     </div>
   );

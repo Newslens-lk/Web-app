@@ -9,6 +9,7 @@ import type {
   ArticleSummary,
   User,
 } from "./types";
+import type { Dictionary } from "./i18n/dictionaries";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "http://localhost:8000/api";
 
@@ -107,11 +108,16 @@ export function getPipelineHistory(limit = 20): Promise<{ runs: PipelineRun[] }>
   return apiFetch(`/admin/pipeline/history?limit=${limit}`);
 }
 
-export function relativeTime(iso: string | null): string {
-  if (!iso) return "recently";
+/**
+ * "5m ago" / "මිනිත්තු 5කට පෙර". The caller passes the dictionary because the
+ * two languages order the number and the unit differently, so this cannot be
+ * built by concatenating a translated suffix.
+ */
+export function relativeTime(iso: string | null, t: Dictionary): string {
+  if (!iso) return t.time.recently;
   const diff = Math.floor((Date.now() - new Date(iso).getTime()) / 60000);
-  if (diff < 60) return `${Math.max(diff, 1)}m ago`;
+  if (diff < 60) return t.time.minutesAgo(Math.max(diff, 1));
   const hours = Math.floor(diff / 60);
-  if (hours < 24) return `${hours}h ago`;
-  return `${Math.floor(hours / 24)}d ago`;
+  if (hours < 24) return t.time.hoursAgo(hours);
+  return t.time.daysAgo(Math.floor(hours / 24));
 }

@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 
+import { useI18n } from "@/lib/i18n/client";
+
 type Theme = "light" | "dark";
 
 /**
@@ -18,6 +20,7 @@ type Theme = "light" | "dark";
  * the media query, not a hardcoded default, to pick the starting icon.
  */
 export function ThemeToggle() {
+  const { t } = useI18n();
   const [theme, setTheme] = useState<Theme | null>(null);
 
   useEffect(() => {
@@ -50,7 +53,7 @@ export function ThemeToggle() {
     return <div className="w-[34px] h-[34px]" aria-hidden />;
   }
 
-  const label = theme === "dark" ? "Switch to light theme" : "Switch to dark theme";
+  const label = theme === "dark" ? t.theme.toLight : t.theme.toDark;
 
   return (
     <button

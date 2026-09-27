@@ -1,9 +1,11 @@
 import Link from "next/link";
 import { getStats } from "@/lib/api";
-import { BIAS_DISPLAY, BIAS_COLORS, SOURCE_DISPLAY } from "@/lib/constants";
+import { BIAS_COLORS, SOURCE_DISPLAY } from "@/lib/constants";
+import { getDictionary } from "@/lib/i18n/server";
 import type { BiasLabel } from "@/lib/types";
 
 export default async function AnalyticsPage() {
+  const t = getDictionary();
   const stats = await getStats();
 
   const biasEntries = Object.entries(stats.bias_breakdown).sort(
@@ -21,14 +23,14 @@ export default async function AnalyticsPage() {
 
   return (
     <div>
-      <h1 className="font-serif text-[24px] font-semibold mb-6">Analytics</h1>
+      <h1 className="font-serif text-[24px] font-semibold mb-6">{t.analytics.title}</h1>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-8">
         {[
-          { label: "Total Articles", value: stats.total_articles },
-          { label: "Total Events", value: stats.total_events },
-          { label: "Articles Today", value: stats.articles_today },
-          { label: "Events Today", value: stats.events_today },
+          { label: t.analytics.totalArticles, value: stats.total_articles },
+          { label: t.analytics.totalEvents, value: stats.total_events },
+          { label: t.analytics.articlesToday, value: stats.articles_today },
+          { label: t.analytics.eventsToday, value: stats.events_today },
         ].map((s) => (
           <div
             key={s.label}
@@ -44,7 +46,7 @@ export default async function AnalyticsPage() {
 
       <div className="grid gap-6 md:grid-cols-2">
         <div className="bg-surface border border-rule rounded-lg p-5">
-          <h2 className="text-[15px] font-semibold mb-4">Bias Distribution</h2>
+          <h2 className="text-[15px] font-semibold mb-4">{t.analytics.biasDistribution}</h2>
           <div className="flex flex-col gap-2.5">
             {biasEntries.map(([label, count]) => (
               <Link
@@ -53,7 +55,7 @@ export default async function AnalyticsPage() {
                 className="flex items-center gap-2 rounded px-1 text-[13px] hover:bg-surface-2"
               >
                 <span className="w-20 text-right text-ink-dim">
-                  {BIAS_DISPLAY[label as BiasLabel] ?? label}
+                  {t.bias[label as BiasLabel] ?? label}
                 </span>
                 <div className="flex-1 h-6 bg-surface-2 rounded overflow-hidden">
                   <div
@@ -74,7 +76,7 @@ export default async function AnalyticsPage() {
         </div>
 
         <div className="bg-surface border border-rule rounded-lg p-5">
-          <h2 className="text-[15px] font-semibold mb-4">Articles per Source</h2>
+          <h2 className="text-[15px] font-semibold mb-4">{t.analytics.articlesPerSource}</h2>
           <div className="flex flex-col gap-2.5">
             {sourceEntries.map(([source, count]) => (
               <div key={source} className="flex items-center gap-2 text-[13px]">
@@ -98,7 +100,7 @@ export default async function AnalyticsPage() {
 
       {stats.last_pipeline_run && (
         <p className="text-[12px] text-ink-faint mt-6">
-          Last pipeline run: {new Date(stats.last_pipeline_run).toLocaleString()}
+          {t.analytics.lastRun} {new Date(stats.last_pipeline_run).toLocaleString()}
         </p>
       )}
     </div>

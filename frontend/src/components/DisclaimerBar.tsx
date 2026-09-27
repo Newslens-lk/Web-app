@@ -1,4 +1,8 @@
+import { getDictionary } from "@/lib/i18n/server";
+
 export function DisclaimerBar() {
+  const t = getDictionary();
+
   return (
     <div className="bg-surface-2 border-b border-rule text-[12.5px] text-ink-dim">
       <div className="mx-auto max-w-shell px-4 sm:px-6 py-2 flex items-start gap-2">
@@ -9,11 +13,8 @@ export function DisclaimerBar() {
           i
         </span>
         <span>
-          <strong className="text-ink font-semibold">
-            Bias labels are model predictions,
-          </strong>{" "}
-          not verified facts. They are generated automatically and should not be
-          treated as authoritative assessments of any news organisation.
+          <strong className="text-ink font-semibold">{t.disclaimer.lead}</strong>{" "}
+          {t.disclaimer.rest}
         </span>
       </div>
     </div>

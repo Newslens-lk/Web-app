@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Nav } from "./Nav";
 import { ThemeToggle } from "./ThemeToggle";
+import { LanguageToggle } from "./LanguageToggle";
 
 export function Masthead() {
   return (
@@ -14,6 +15,7 @@ export function Masthead() {
           <span className="text-amber italic">Lens</span>
         </Link>
         <Nav />
+        <LanguageToggle />
         <ThemeToggle />
       </div>
     </header>

@@ -1,0 +1,24 @@
+services:
+  # Standalone stand-in for the Data-Pipeline `news-db`, for running the web app
+  # without the pipeline stack. Host port 55432 avoids clashing with the
+  # pipeline's own Postgres (or any local install) on 5432.
+  news-db-local:
+    image: pgvector/pgvector:pg16
+    container_name: newslens-local-db
+    environment:
+      POSTGRES_DB: news_pipeline
+      POSTGRES_USER: news
+      POSTGRES_PASSWORD: news
+    ports:
+      - "55432:5432"
+    volumes:
+      - newslens_local_pgdata:/var/lib/postgresql/data
+      - ./local/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U news -d news_pipeline"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+volumes:
+  newslens_local_pgdata:

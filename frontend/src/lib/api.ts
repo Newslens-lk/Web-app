@@ -37,6 +37,8 @@ export function registerUser(payload: {
   email: string;
   display_name: string;
   password: string;
+  /** Interface language, so the welcome email matches what they are reading. */
+  locale: string;
 }): Promise<{ user: User }> {
   return apiFetch("/auth/register", {
     method: "POST",

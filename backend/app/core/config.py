@@ -26,6 +26,20 @@ class Settings(BaseSettings):
     admin_display_name: str = "NewsLens Admin"
     auth_secret: str = "change-this-auth-secret"
 
+    # Transactional email over SMTP (Gmail by default). With no username or
+    # password the app logs the message instead of sending it, so the backend
+    # runs without credentials and development never mails a real person by
+    # accident.
+    smtp_host: str = "smtp.gmail.com"
+    smtp_port: int = 587
+    smtp_user: str = ""
+    smtp_password: str = ""
+    # Display name beside the sender address. Gmail rewrites the address itself
+    # to the authenticated account, so only the name here is ours to choose.
+    email_from_name: str = "NewsLens"
+    # Where "visit the site" links in emails point.
+    site_url: str = "http://localhost:3000"
+
     @property
     def database_url(self) -> str:
         return f"postgresql+psycopg://{self.db_user}:{self.db_password}@{self.db_host}:{self.db_port}/{self.db_name}"

@@ -29,7 +29,7 @@ export function DigitalClock() {
     return (
       <div
         aria-hidden
-        className="bg-surface border border-rule rounded-[10px] p-5 min-h-[168px]"
+        className="bg-surface border border-rule rounded-[3px] p-5 min-h-[168px]"
       />
     );
   }
@@ -56,20 +56,20 @@ export function DigitalClock() {
   const weekday = now.toLocaleDateString(dateLocale, { weekday: "long" });
 
   return (
-    <div className="bg-surface border border-rule rounded-[10px] p-5">
+    <div className="rounded-[3px] border border-rule bg-surface p-5 shadow-1">
       <div className="flex justify-between items-start gap-3 mb-4">
         <div>
           <div className="text-xs font-bold uppercase tracking-wider text-ink-faint">
             {t.widgets.clock}
           </div>
-          <div className="text-[11px] text-ink-faint mt-1">
+          <div className="text-xs text-ink-faint mt-1">
             {t.widgets.clockSubtitle}
           </div>
         </div>
         <div
           role="group"
           aria-label={t.widgets.timeFormat}
-          className="inline-flex bg-surface-2 rounded-full p-0.5 text-[11px] font-semibold flex-none"
+          className="inline-flex bg-surface-2 rounded-full p-0.5 text-xs font-semibold flex-none"
         >
           {(["12", "24"] as const).map((m) => (
             <button
@@ -91,19 +91,19 @@ export function DigitalClock() {
 
       <div className="flex items-end justify-between gap-3 flex-wrap">
         <div
-          className="font-mono tabular-nums text-[38px] leading-none font-bold text-ink"
+          className="font-mono tabular-nums text-2xl leading-none font-bold text-ink"
           aria-live="off"
         >
           {timeMain}
           {mode === "12" && (
-            <span className="text-[14px] font-semibold text-ink-dim ml-1.5">
+            <span className="text-base font-semibold text-ink-dim ml-1.5">
               {suffix}
             </span>
           )}
         </div>
         <div className="text-right">
-          <div className="text-[13px] text-ink">{dateLine}</div>
-          <div className="text-[13px] text-ink-dim">{weekday}</div>
+          <div className="text-sm text-ink">{dateLine}</div>
+          <div className="text-sm text-ink-dim">{weekday}</div>
         </div>
       </div>
     </div>

@@ -20,7 +20,7 @@ export function WeatherWidget() {
   const t = getDictionary();
 
   return (
-    <div className="bg-surface border border-rule rounded-[10px] p-5">
+    <div className="rounded-[3px] border border-rule bg-surface p-5 shadow-1">
       <div className="text-xs font-bold uppercase tracking-wider text-ink-faint mb-3">
         {t.widgets.weather}
       </div>

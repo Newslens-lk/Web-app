@@ -6,7 +6,7 @@ import { useCallback } from "react";
 import { useI18n } from "@/lib/i18n/client";
 
 const selectClass =
-  "bg-surface border border-rule-strong rounded-md px-3 py-[9px] text-[13.5px] text-ink min-w-[128px]";
+  "bg-surface border border-rule-strong rounded-md px-3 py-[9px] text-sm text-ink min-w-[128px]";
 
 export function FilterBar() {
   const router = useRouter();
@@ -22,7 +22,7 @@ export function FilterBar() {
         sp.delete(key);
       }
       sp.delete("page");
-      router.push(`/?${sp.toString()}`);
+      router.push(`/home?${sp.toString()}`);
     },
     [router, params],
   );

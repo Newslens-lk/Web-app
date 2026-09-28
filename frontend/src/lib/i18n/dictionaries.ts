@@ -68,6 +68,20 @@ export const en = {
     daysAgo: (n: number) => `${n}d ago`,
   },
 
+  landing: {
+    kicker: "Bias-aware Sinhala news",
+    // Two lines: the second is the turn. Kept short because it is set large.
+    headlineTop: "One story.",
+    headlineBottom: "Five positions.",
+    standfirst:
+      "Sri Lanka's outlets rarely report the same event the same way. NewsLens puts their coverage side by side and labels where each one leans.",
+    // The two buttons reuse nav.home and nav.logIn rather than having their
+    // own copy, so the landing never drifts out of step with the masthead.
+    liveCounts: (articles: number, events: number, sources: number) =>
+      `${articles} articles · ${events} events · ${sources} sources`,
+    spectrum: "Far left to far right",
+  },
+
   home: {
     latestEvents: "Latest events",
     totalAndPage: (total: number, page: number) => `${total} total · page ${page}`,
@@ -273,6 +287,17 @@ export const si: Dictionary = {
     minutesAgo: (n: number) => `මිනිත්තු ${n}කට පෙර`,
     hoursAgo: (n: number) => `පැය ${n}කට පෙර`,
     daysAgo: (n: number) => `දින ${n}කට පෙර`,
+  },
+
+  landing: {
+    kicker: "නැඹුරුව හඳුනාගන්නා සිංහල ප්‍රවෘත්ති",
+    headlineTop: "එක් පුවතක්.",
+    headlineBottom: "දෘෂ්ටිකෝණ පහක්.",
+    standfirst:
+      "ශ්‍රී ලංකාවේ මාධ්‍ය ආයතන එකම සිදුවීම එකම ආකාරයෙන් වාර්තා කරන්නේ කලාතුරකිනි. NewsLens ඒවායේ වාර්තා එකට තබා, එක් එක් ආයතනය නැඹුරු වන දිශාව පෙන්වයි.",
+    liveCounts: (articles: number, events: number, sources: number) =>
+      `ලිපි ${articles} · සිදුවීම් ${events} · ආයතන ${sources}`,
+    spectrum: "අන්ත වාමාංශිකයේ සිට අන්ත දක්ෂිණාංශික දක්වා",
   },
 
   home: {

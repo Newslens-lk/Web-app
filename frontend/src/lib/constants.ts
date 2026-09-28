@@ -12,17 +12,41 @@ export const BIAS_COLORS: Record<BiasLabel, string> = {
   far_right: "var(--bias-far-right)",
 };
 
+/**
+ * The text colour to use *on* each bias colour.
+ *
+ * Not always white: the orange at the left of the scale fails contrast under
+ * white text (3.5:1), and in dark mode the lifted reds and greys do too. Each
+ * pairing is resolved per theme in globals.css so a label is always readable
+ * on the colour behind it.
+ */
+export const BIAS_ON_COLORS: Record<BiasLabel, string> = {
+  far_left: "var(--bias-far-left-on)",
+  left: "var(--bias-left-on)",
+  center: "var(--bias-center-on)",
+  right: "var(--bias-right-on)",
+  far_right: "var(--bias-far-right-on)",
+};
+
 export const BIAS_LABELS: BiasLabel[] = ["far_left", "left", "center", "right", "far_right"];
 
 // Bias names are translated, so they live in lib/i18n/dictionaries.ts under
 // `bias` rather than here — read them as `t.bias[label]`.
 
-export const SOURCE_COLORS: Record<string, string> = {
-  hirunews: "#FF6B00",
-  bbc_sinhala: "#BB1919",
-  lankadeepa: "#1B5E20",
-  newsfirst: "#0D47A1",
-  divaina: "#6A1B9A",
+// The outlets' own brand *colours* are deliberately not used as swatches: two
+// of them are a red and a blue, landing exactly where the bias scale puts
+// far-left and right, so a bare colour chip would be ambiguous. A logo is
+// different — it reads as an identity rather than as a code — so the mastheads
+// below are used, and nothing else borrows their colours.
+//
+// Keys are `source_name` as the pipeline stores it, so a lookup is direct.
+// Files live in public/logos and are served from the site root.
+export const SOURCE_LOGOS: Record<string, string> = {
+  hirunews: "/logos/hirunews.jpg",
+  bbc_sinhala: "/logos/bbc_sinhala.webp",
+  lankadeepa: "/logos/lankadeepa.png",
+  newsfirst: "/logos/newsfirst.jpg",
+  divaina: "/logos/divaina.png",
 };
 
 export const SOURCE_DISPLAY: Record<string, string> = {
@@ -37,6 +61,6 @@ export function sourceDisplayName(name: string): string {
   return SOURCE_DISPLAY[name] ?? name;
 }
 
-export function sourceColor(name: string): string {
-  return SOURCE_COLORS[name] ?? "#6B7280";
+export function sourceLogo(name: string): string | null {
+  return SOURCE_LOGOS[name] ?? null;
 }

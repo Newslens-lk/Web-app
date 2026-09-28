@@ -1,128 +1,133 @@
-import { Suspense } from "react";
+import type { CSSProperties } from "react";
 import Link from "next/link";
-import { FilterBar } from "@/components/FilterBar";
-import { EventCard } from "@/components/EventCard";
-import { DigitalClock } from "@/components/DigitalClock";
-import { WeatherWidget } from "@/components/WeatherWidget";
-import { getEvents, getStats } from "@/lib/api";
+
+import { getArticles, getStats } from "@/lib/api";
+import { BIAS_COLORS, BIAS_LABELS } from "@/lib/constants";
 import { getDictionary } from "@/lib/i18n/server";
+import { NewsCollage } from "@/components/NewsCollage";
 
-type Props = { searchParams: Record<string, string | undefined> };
-
-export default async function HomePage({ searchParams }: Props) {
+/**
+ * The cover of the publication.
+ *
+ * A saturated plum ground with a pile of front pages scattered across it. The
+ * reference for this was an orange collage; the arrangement is what was worth
+ * taking, not the colour — this site already has a palette, and the five bias
+ * colours must stay the only ones making a claim, so the ground is the brand's
+ * own plum and the cards carry the only other colour on the page.
+ *
+ * The cards are not links. The two buttons are the way in; everything else is
+ * there to show what the site does before anyone has clicked anything.
+ */
+export default async function LandingPage() {
   const t = getDictionary();
-  const params: Record<string, string> = {};
-  if (searchParams.source) params.source = searchParams.source;
-  if (searchParams.min_sources) params.min_sources = searchParams.min_sources;
-  if (searchParams.page) params.page = searchParams.page;
 
-  const [eventList, stats] = await Promise.all([
-    getEvents(params),
+  // Settled rather than awaited together: an empty or unreachable database
+  // should still render the cover, just without the pile.
+  const [articlesResult, statsResult] = await Promise.allSettled([
+    getArticles({ page_size: "12" }),
     getStats(),
   ]);
 
-  const totalPages = Math.ceil(eventList.total / eventList.page_size);
-  const pageUrl = (page: number) => {
-    const query = new URLSearchParams();
-    for (const [key, value] of Object.entries(searchParams)) {
-      if (key !== "page" && value) query.set(key, value);
-    }
-    query.set("page", String(page));
-    return `/?${query.toString()}`;
-  };
+  const articles =
+    articlesResult.status === "fulfilled" ? articlesResult.value.articles : [];
+  const stats = statsResult.status === "fulfilled" ? statsResult.value : null;
 
   return (
-    <>
-      <div className="bg-surface-2 border border-rule rounded-lg px-5 py-3 mb-6 flex flex-wrap gap-x-6 gap-y-1 text-[13px]">
-        <span>
-          <span className="font-mono tabular-nums font-semibold">{stats.total_articles}</span>{" "}
-          {t.common.articles}
-        </span>
-        <span>
-          <span className="font-mono tabular-nums font-semibold">{stats.total_events}</span>{" "}
-          {t.common.events}
-        </span>
-        <span>
-          <span className="font-mono tabular-nums font-semibold">{stats.total_sources}</span>{" "}
-          {t.common.sources}
-        </span>
-      </div>
+    // Breaks out of the centred page shell to run edge to edge. `overflow-x:
+    // clip` on the body absorbs the scrollbar's width.
+    // The plum is fixed rather than `bg-brand`: that token lifts to a pale
+    // pink in dark mode, which would leave this white text unreadable. A cover
+    // keeps its own colour whichever theme the reading interface is in.
+    <section className="relative left-1/2 -mt-8 w-screen -translate-x-1/2 overflow-hidden bg-[#5b2545] text-[#F3F1F2]">
+      <NewsCollage articles={articles} />
 
-      <Suspense>
-        <FilterBar />
-      </Suspense>
+      {/* The pile runs under the text, so a wash from the left keeps the
+          headline legible over whatever card happens to sit behind it. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 bg-gradient-to-r from-[#5b2545] via-[#5b2545]/90 to-transparent lg:to-[#5b2545]/10"
+      />
 
-      {/* Two-column split on desktop: event feed left, widget rail right.
-          Mobile stacks the rail below the feed. `minmax(0,1fr)` lets the feed
-          column shrink below its content width, so long Sinhala headlines
-          wrap instead of forcing the page to scroll sideways. */}
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_300px]">
-        <div>
-          <div className="flex justify-between items-baseline flex-wrap gap-2 mb-4">
-            <h2 className="font-serif text-[20px] font-semibold text-balance">
-              {t.home.latestEvents}
-            </h2>
-            <span className="text-[13px] text-ink-dim">
-              {t.home.totalAndPage(eventList.total, eventList.page)}
+      <div className="relative z-50 mx-auto flex min-h-[80vh] max-w-shell flex-col justify-center px-4 py-20 sm:px-6">
+        {/* The sequence is the argument: the claim, then the scale it rests
+            on, then the evidence settling in behind it, then the way in. The
+            delays below interleave with the collage's, which starts at 320ms. */}
+        <div className="max-w-[34rem]">
+          <p
+            className="rise-in text-xs font-semibold uppercase tracking-eyebrow text-[#E8C878]"
+            style={{ "--delay": "0ms" } as CSSProperties}
+          >
+            {t.landing.kicker}
+          </p>
+
+          <h1 className="mt-5 font-serif text-[clamp(2.6rem,7vw,4.5rem)] font-semibold leading-[1.02] tracking-[-0.03em]">
+            <span className="rise-in block" style={{ "--delay": "90ms" } as CSSProperties}>
+              {t.landing.headlineTop}
             </span>
-          </div>
+            <span
+              className="rise-in block text-[#D9A3C4]"
+              style={{ "--delay": "190ms" } as CSSProperties}
+            >
+              {t.landing.headlineBottom}
+            </span>
+          </h1>
 
-          <div className="grid gap-4 sm:grid-cols-2">
-            {eventList.events.map((event) => (
-              <EventCard key={event.event_id} event={event} />
+          {/* The scale, stated once before any card uses it. It draws itself
+              from the left, which is also the direction it reads in. */}
+          <div
+            className="draw-x mt-6 flex h-[6px] w-full max-w-[24rem] overflow-hidden rounded-full"
+            style={{ "--delay": "300ms" } as CSSProperties}
+            role="img"
+            aria-label={t.landing.spectrum}
+          >
+            {BIAS_LABELS.map((label) => (
+              <span
+                key={label}
+                className="h-full flex-1"
+                style={{ backgroundColor: BIAS_COLORS[label] }}
+              />
             ))}
           </div>
 
-          {eventList.events.length === 0 && (
-            <p className="text-ink-dim text-center py-12">{t.home.noEvents}</p>
-          )}
+          <p
+            className="rise-in mt-7 max-w-[30rem] text-base leading-[1.7] text-[#E5D3DE]"
+            style={{ "--delay": "430ms" } as CSSProperties}
+          >
+            {t.landing.standfirst}
+          </p>
 
-          {totalPages > 1 && (
-            <nav aria-label={t.home.eventPages} className="mt-8 flex items-center justify-center gap-3 text-[13px]">
-              {eventList.page > 1 ? (
-                <Link
-                  href={pageUrl(eventList.page - 1)}
-                  className="rounded-md border border-rule-strong bg-surface px-3 py-2 font-semibold text-ink-dim hover:bg-surface-2 hover:text-ink"
-                >
-                  {t.common.previous}
-                </Link>
-              ) : (
-                <span className="rounded-md border border-rule bg-surface-2 px-3 py-2 text-ink-faint">
-                  {t.common.previous}
-                </span>
+          <div
+            className="rise-in mt-9 flex flex-wrap items-center gap-3"
+            style={{ "--delay": "560ms" } as CSSProperties}
+          >
+            <Link
+              href="/home"
+              className="rounded-[2px] bg-[#F3F1F2] px-6 py-3 text-base font-semibold text-[#3D1730] transition-opacity hover:opacity-85"
+            >
+              {t.nav.home}
+            </Link>
+            <Link
+              href="/login"
+              className="rounded-[2px] border border-[#8E5A77] px-6 py-3 text-base font-semibold text-[#F3F1F2] transition-colors hover:border-[#F3F1F2] hover:bg-white/10"
+            >
+              {t.nav.logIn}
+            </Link>
+          </div>
+
+          {stats && (
+            <p
+              className="rise-in mt-12 font-mono text-xs uppercase tracking-eyebrow tabular-nums text-[#C49BB4]"
+              style={{ "--delay": "700ms" } as CSSProperties}
+            >
+              {t.landing.liveCounts(
+                stats.total_articles,
+                stats.total_events,
+                stats.total_sources,
               )}
-
-              <span className="text-ink-dim">
-                {t.common.pageOf(eventList.page, totalPages)}
-              </span>
-
-              {eventList.page < totalPages ? (
-                <Link
-                  href={pageUrl(eventList.page + 1)}
-                  className="rounded-md border border-rule-strong bg-surface px-3 py-2 font-semibold text-ink-dim hover:bg-surface-2 hover:text-ink"
-                >
-                  {t.common.next}
-                </Link>
-              ) : (
-                <span className="rounded-md border border-rule bg-surface-2 px-3 py-2 text-ink-faint">
-                  {t.common.next}
-                </span>
-              )}
-            </nav>
+            </p>
           )}
         </div>
-
-        {/* Ambient widgets. Sticky so they stay in view while the feed
-            scrolls; `self-start` stops the rail stretching to feed height.
-            Further widgets go here. */}
-        <aside
-          aria-label={t.home.atAGlance}
-          className="flex flex-col gap-4 lg:sticky lg:top-24 lg:self-start"
-        >
-          <DigitalClock />
-          <WeatherWidget />
-        </aside>
       </div>
-    </>
+    </section>
   );
 }

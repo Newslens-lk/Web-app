@@ -5,6 +5,7 @@ import { FormEvent, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 
 import { loginUser, registerUser } from "@/lib/api";
+import { ShineBorder } from "@/components/ShineBorder";
 import { useI18n } from "@/lib/i18n/client";
 
 type Mode = "login" | "register";
@@ -44,19 +45,19 @@ export default function LoginPage() {
   const isRegistering = mode === "register";
 
   return (
-    <div className="mx-auto max-w-md py-8 sm:py-14">
+    <div className="rise-in mx-auto max-w-md py-8 sm:py-14">
       <div className="mb-7">
-        <p className="text-[12px] font-semibold uppercase tracking-[0.18em] text-amber">
+        <p className="text-sm font-semibold uppercase tracking-eyebrow text-amber">
           {isAdminLogin ? t.auth.adminKicker : t.auth.accountKicker}
         </p>
-        <h1 className="mt-2 font-serif text-[30px] font-semibold">
+        <h1 className="mt-2 font-serif text-xl font-semibold">
           {isAdminLogin
             ? t.auth.adminTitle
             : isRegistering
               ? t.auth.registerTitle
               : t.auth.loginTitle}
         </h1>
-        <p className="mt-2 text-[14px] text-ink-dim">
+        <p className="mt-2 text-base text-ink-dim">
           {isAdminLogin
             ? t.auth.adminIntro
             : isRegistering
@@ -65,7 +66,7 @@ export default function LoginPage() {
         </p>
       </div>
 
-      {!isAdminLogin && <div className="mb-5 flex rounded-lg border border-rule bg-surface-2 p-1">
+      {!isAdminLogin && <div className="mb-5 flex rounded-[3px] border border-rule bg-surface-2 p-1">
         {(["login", "register"] as Mode[]).map((option) => (
           <button
             key={option}
@@ -74,8 +75,8 @@ export default function LoginPage() {
               setMode(option);
               setError(null);
             }}
-            className={`flex-1 rounded-md px-3 py-2 text-[13px] font-semibold ${
-              mode === option ? "bg-surface text-ink shadow-sm" : "text-ink-dim"
+            className={`flex-1 rounded-md px-3 py-2 text-sm font-semibold ${
+              mode === option ? "bg-surface text-ink shadow-1" : "text-ink-dim"
             }`}
           >
             {option === "login" ? t.auth.tabLogin : t.auth.tabRegister}
@@ -83,15 +84,26 @@ export default function LoginPage() {
         ))}
       </div>}
 
-      <form onSubmit={handleSubmit} className="rounded-lg border border-rule bg-surface p-5 shadow-sm">
+      <form
+        onSubmit={handleSubmit}
+        className="relative overflow-hidden rounded-[3px] border border-rule bg-surface p-5 shadow-2"
+      >
+        {/* Plum and gold — the interface's own colours. The bias palette is
+            never spent on decoration; those five make a claim about an outlet,
+            and using them here would dilute it. */}
+        <ShineBorder
+          borderWidth={2}
+          duration={10}
+          shineColor={["#5b2545", "#d9b65c", "#d9a3c4"]}
+        />
         {error && (
-          <div className="mb-4 rounded-md border border-amber bg-amber-tint px-3 py-2 text-[13px] text-amber">
+          <div className="mb-4 rounded-md border border-amber bg-amber-tint px-3 py-2 text-sm text-amber">
             {error}
           </div>
         )}
 
         {isRegistering && (
-          <label className="mb-4 block text-[13px] font-semibold">
+          <label className="mb-4 block text-sm font-semibold">
             {t.auth.displayName}
             <input
               required
@@ -102,7 +114,7 @@ export default function LoginPage() {
           </label>
         )}
 
-        <label className="mb-4 block text-[13px] font-semibold">
+        <label className="mb-4 block text-sm font-semibold">
           {t.auth.email}
           <input
             required
@@ -114,7 +126,7 @@ export default function LoginPage() {
           />
         </label>
 
-        <label className="mb-5 block text-[13px] font-semibold">
+        <label className="mb-5 block text-sm font-semibold">
           {t.auth.password}
           <input
             required
@@ -130,7 +142,7 @@ export default function LoginPage() {
         <button
           type="submit"
           disabled={submitting}
-          className="w-full rounded-md bg-brand px-4 py-2.5 text-[14px] font-semibold text-white hover:opacity-90 disabled:opacity-50"
+          className="w-full rounded-md bg-brand px-4 py-2.5 text-base font-semibold text-white hover:opacity-90 disabled:opacity-50"
         >
           {submitting
             ? t.auth.submitting
@@ -140,7 +152,7 @@ export default function LoginPage() {
         </button>
       </form>
 
-      <Link href={isAdminLogin ? "/login" : "/"} className="mt-5 block text-center text-[13px] font-semibold text-brand hover:underline">
+      <Link href={isAdminLogin ? "/login" : "/"} className="mt-5 block text-center text-sm font-semibold text-brand hover:underline">
         {isAdminLogin ? t.auth.toUserLogin : t.auth.keepBrowsing}
       </Link>
     </div>

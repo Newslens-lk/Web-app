@@ -18,7 +18,7 @@ export function LanguageToggle() {
     <div
       role="group"
       aria-label={t.language.switcher}
-      className="inline-flex flex-none rounded-full bg-surface-2 p-0.5 text-[11.5px] font-semibold"
+      className="inline-flex flex-none rounded-full bg-surface-2 p-0.5 text-xs font-semibold"
     >
       {LOCALES.map((option: Locale) => {
         const active = option === locale;

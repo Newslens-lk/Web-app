@@ -15,7 +15,7 @@ type Props = {
 };
 
 const inputClass =
-  "rounded-md border border-rule-strong bg-surface px-3 py-[9px] text-[13.5px] text-ink placeholder:text-ink-faint";
+  "rounded-md border border-rule-strong bg-surface px-3 py-[9px] text-sm text-ink placeholder:text-ink-faint";
 
 function inputDateValue(value?: string) {
   return value?.slice(0, 10) ?? "";
@@ -52,9 +52,12 @@ export function ArticleFilters({ search, source, biasLabel, dateFrom, dateTo }: 
   }
 
   return (
-    <form onSubmit={submit} className="mb-6 rounded-lg border border-rule bg-surface-2 p-4">
+    <form
+      onSubmit={submit}
+      className="mb-6 rounded-[3px] border border-rule bg-surface p-4 shadow-1"
+    >
       <div className="grid gap-3 md:grid-cols-[minmax(220px,1.5fr)_1fr_1fr]">
-        <label className="flex flex-col gap-1.5 text-[12px] font-semibold text-ink-dim">
+        <label className="flex flex-col gap-1.5 text-sm font-semibold text-ink-dim">
           {t.filters.searchNews}
           <input
             name="search"
@@ -66,7 +69,7 @@ export function ArticleFilters({ search, source, biasLabel, dateFrom, dateTo }: 
           />
         </label>
 
-        <label className="flex flex-col gap-1.5 text-[12px] font-semibold text-ink-dim">
+        <label className="flex flex-col gap-1.5 text-sm font-semibold text-ink-dim">
           {t.filters.source}
           <select name="source" defaultValue={source ?? ""} className={inputClass}>
             <option value="">{t.filters.allSources}</option>
@@ -76,7 +79,7 @@ export function ArticleFilters({ search, source, biasLabel, dateFrom, dateTo }: 
           </select>
         </label>
 
-        <label className="flex flex-col gap-1.5 text-[12px] font-semibold text-ink-dim">
+        <label className="flex flex-col gap-1.5 text-sm font-semibold text-ink-dim">
           {t.filters.bias}
           <select name="bias_label" defaultValue={biasLabel ?? ""} className={inputClass}>
             <option value="">{t.filters.allBiasLabels}</option>
@@ -88,19 +91,19 @@ export function ArticleFilters({ search, source, biasLabel, dateFrom, dateTo }: 
       </div>
 
       <div className="mt-3 flex flex-wrap items-end gap-3">
-        <label className="flex flex-col gap-1.5 text-[12px] font-semibold text-ink-dim">
+        <label className="flex flex-col gap-1.5 text-sm font-semibold text-ink-dim">
           {t.filters.from}
           <input name="date_from" type="date" defaultValue={inputDateValue(dateFrom)} className={inputClass} />
         </label>
-        <label className="flex flex-col gap-1.5 text-[12px] font-semibold text-ink-dim">
+        <label className="flex flex-col gap-1.5 text-sm font-semibold text-ink-dim">
           {t.filters.to}
           <input name="date_to" type="date" defaultValue={inputDateValue(dateTo)} className={inputClass} />
         </label>
-        <button type="submit" className="rounded-md bg-brand px-4 py-[10px] text-[13px] font-semibold text-white hover:opacity-90">
+        <button type="submit" className="rounded-md bg-brand px-4 py-[10px] text-sm font-semibold text-white hover:opacity-90">
           {t.filters.apply}
         </button>
         {(search || source || biasLabel || dateFrom || dateTo) && (
-          <button type="button" onClick={clear} className="px-2 py-[10px] text-[13px] font-semibold text-ink-dim hover:text-ink">
+          <button type="button" onClick={clear} className="px-2 py-[10px] text-sm font-semibold text-ink-dim hover:text-ink">
             {t.filters.clear}
           </button>
         )}

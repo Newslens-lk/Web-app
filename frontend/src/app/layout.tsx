@@ -1,13 +1,49 @@
 import type { Metadata, Viewport } from "next";
+import { IBM_Plex_Sans, Newsreader, Noto_Serif_Sinhala } from "next/font/google";
 import "./globals.css";
 import { Masthead } from "@/components/Masthead";
 import { Footer } from "@/components/Footer";
+import { LocaleProvider } from "@/lib/i18n/client";
+import { getDictionary, getLocale } from "@/lib/i18n/server";
 
-export const metadata: Metadata = {
-  title: "NewsLens",
-  description:
-    "Compare how different Sri Lankan outlets report the same story — bias-aware Sinhala news aggregation.",
-};
+/**
+ * Three faces, each with one job.
+ *
+ * Newsreader sets headlines — a text serif drawn for screen news, so it holds
+ * up at 14px in a card and at 72px on the cover. IBM Plex Sans handles the
+ * interface: labels, buttons, metadata. Noto Serif Sinhala sits last in both
+ * stacks so the browser reaches for it per character — Latin keeps Newsreader
+ * or Plex, Sinhala gets a face actually drawn for it. Until now the stylesheet
+ * named a Sinhala font but never loaded one, so every Sinhala headline was
+ * rendering in whatever the OS happened to have.
+ */
+const display = Newsreader({
+  subsets: ["latin"],
+  weight: ["400", "600", "700"],
+  variable: "--font-display",
+  display: "swap",
+});
+
+const ui = IBM_Plex_Sans({
+  subsets: ["latin"],
+  weight: ["400", "500", "600"],
+  variable: "--font-ui",
+  display: "swap",
+});
+
+const sinhala = Noto_Serif_Sinhala({
+  subsets: ["sinhala"],
+  weight: ["400", "600", "700"],
+  variable: "--font-sinhala",
+  display: "swap",
+});
+
+export function generateMetadata(): Metadata {
+  return {
+    title: "NewsLens",
+    description: getDictionary().meta.description,
+  };
+}
 
 // Lets the browser theme its own chrome (scrollbars, form controls) to match.
 export const viewport: Viewport = {
@@ -23,19 +59,29 @@ const themeScript = `(function(){try{var t=localStorage.getItem("theme");if(t===
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
+  // The language lives in a cookie rather than localStorage so this server
+  // render already knows it — no flash of the other language on first paint.
+  const locale = getLocale();
+
   return (
     // The inline script mutates <html> before React hydrates, which React would
     // otherwise report as a server/client attribute mismatch.
-    <html lang="si" suppressHydrationWarning>
+    <html
+      lang={locale}
+      className={`${display.variable} ${ui.variable} ${sinhala.variable}`}
+      suppressHydrationWarning
+    >
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
-      <body className="bg-bg text-ink font-sans text-[15px] leading-relaxed">
-        <Masthead />
-        <main className="mx-auto max-w-shell px-4 sm:px-6 py-8 pb-20">
-          {children}
-        </main>
-        <Footer />
+      <body className="bg-bg text-ink font-sans text-base leading-relaxed">
+        <LocaleProvider locale={locale}>
+          <Masthead />
+          <main className="mx-auto max-w-shell px-4 sm:px-6 py-8 pb-20">
+            {children}
+          </main>
+          <Footer />
+        </LocaleProvider>
       </body>
     </html>
   );

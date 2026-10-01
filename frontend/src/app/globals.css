@@ -2,31 +2,70 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --bg: #f5f5f0;
-  --surface: #ffffff;
-  --surface-2: #eceae2;
-  --surface-3: #e2dfd4;
-  --ink: #171a1c;
-  --ink-dim: #5b6165;
-  --ink-faint: #8a8f91;
-  --rule: #dad7cc;
-  --rule-strong: #c4c0b2;
-  --brand: #1b4b5a;
-  --brand-ink: #0f323d;
-  --brand-tint: #e4eeef;
-  --amber: #b9752a;
-  --amber-tint: #f6e9d6;
+/* ---------------------------------------------------------------------------
+   One rule governs this palette: colour is evidence.
 
-  /* 5-class bias colors from spec */
+   The five bias colours run red -> orange -> grey -> blue -> navy, and they
+   carry a claim about where an outlet leans. So the interface may not spend
+   any colour on that axis. A red button or an orange heading would read as the
+   site taking the side it is supposed to be measuring — the one thing a
+   bias-labelling tool cannot afford to look like.
+
+   Everything the interface owns therefore sits off that axis, in aubergine: a
+   deep plum the political scale here never reaches, dark enough that it never
+   competes with the far-left red for attention. Gold covers eyebrows and
+   warnings, far enough from the "left" orange to never be mistaken for it.
+--------------------------------------------------------------------------- */
+:root {
+  /* Warm grey paper rather than the usual cream, pulled very slightly toward
+     the plum so the ground and the brand belong to each other. */
+  --bg: #f3f1f2;
+  --surface: #ffffff;
+  --surface-2: #e9e5e7;
+  --surface-3: #dcd5d9;
+  --ink: #1a1418;
+  --ink-dim: #574b53;
+  --ink-faint: #8a7f85;
+  --rule: #ded8db;
+  --rule-strong: #c8bfc4;
+  --brand: #5b2545;
+  --brand-ink: #3d1730;
+  --brand-tint: #f0e6ec;
+  /* Gold, not orange — see the note above about the left-hand end of the
+     bias scale. */
+  --amber: #8a6a12;
+  --amber-tint: #f2ebd5;
+
+  /* 5-class bias colors from spec. Reserved: nothing but bias data uses these. */
   --bias-far-left: #DC2626;
   --bias-left: #EA580C;
   --bias-center: #6B7280;
   --bias-right: #2563EB;
   --bias-far-right: #1E3A8A;
 
-  --font-serif: "Noto Sans Sinhala", "Iowan Old Style", Georgia, serif;
-  --font-sans: "Noto Sans Sinhala", -apple-system, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  /* Text set on each of those. White fails on the orange (3.5:1), so that one
+     takes ink instead — every pairing here clears 4.5:1. */
+  --bias-far-left-on: #ffffff;
+  --bias-left-on: #1a1418;
+  --bias-center-on: #ffffff;
+  --bias-right-on: #ffffff;
+  --bias-far-right-on: #ffffff;
+
+  /* Elevation.
+     Tinted with the ink's own plum rather than pure black — a neutral grey
+     shadow over warm paper reads as dirt on the page. Each level pairs a tight
+     contact shadow with a wider ambient one, which is what stops a raised
+     surface looking like it is floating free of the page.
+     Level 1 rests, 2 is for anything the reader can act on, 3 is reserved for
+     what they are acting on right now. */
+  --shadow-1: 0 1px 2px rgba(26, 20, 24, 0.05), 0 1px 1px rgba(26, 20, 24, 0.04);
+  --shadow-2: 0 2px 4px rgba(26, 20, 24, 0.05), 0 6px 14px rgba(26, 20, 24, 0.06);
+  --shadow-3: 0 2px 6px rgba(26, 20, 24, 0.06), 0 14px 32px rgba(26, 20, 24, 0.11);
+
+  /* Latin first, Sinhala last: the browser falls back per character, so Latin
+     keeps Newsreader or Plex and Sinhala reaches a face drawn for it. */
+  --font-serif: var(--font-display), var(--font-sinhala), "Iowan Old Style", Georgia, serif;
+  --font-sans: var(--font-ui), var(--font-sinhala), -apple-system, "Segoe UI", Arial, sans-serif;
   --font-mono: ui-monospace, "SF Mono", "Cascadia Code", Consolas, monospace;
 }
 
@@ -38,52 +77,80 @@
    Keep the two token lists in sync when editing. */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #14171a;
-    --surface: #1b1f23;
-    --surface-2: #23282d;
-    --surface-3: #2b3137;
-    --ink: #eceae3;
-    --ink-dim: #a7adb0;
-    --ink-faint: #767c80;
-    --rule: #32383e;
-    --rule-strong: #3d444b;
-    --brand: #7fb2c2;
-    --brand-ink: #cfe6ec;
-    --brand-tint: #1e333a;
-    --amber: #e3a55c;
-    --amber-tint: #3a2e1c;
+    --bg: #151114;
+    --surface: #1c171b;
+    --surface-2: #241e23;
+    --surface-3: #2e262c;
+    --ink: #ece7ea;
+    --ink-dim: #aaa0a6;
+    --ink-faint: #877d83;
+    --rule: #322a30;
+    --rule-strong: #43393f;
+    /* Lifted well past the light-mode plum: #5b2545 on this ground would fail
+       contrast for links and buttons. */
+    --brand: #d9a3c4;
+    --brand-ink: #f0dce8;
+    --brand-tint: #2a1a24;
+    --amber: #d9b65c;
+    --amber-tint: #332b15;
 
-    /* Lifted so the darkest buckets stay visible on a dark ground, while
-       staying mid-tone enough for the white text BiasLabel puts on them. */
-    --bias-far-left: #e5484d;
+    /* A shadow cast on a dark ground is nearly invisible, so depth here comes
+       from a lighter surface plus a deeper, wider shadow rather than from the
+       shadow alone. */
+    --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.4);
+    --shadow-2: 0 2px 4px rgba(0, 0, 0, 0.4), 0 6px 16px rgba(0, 0, 0, 0.36);
+    --shadow-3: 0 4px 10px rgba(0, 0, 0, 0.45), 0 18px 40px rgba(0, 0, 0, 0.5);
+
+    /* Lifted so the darkest buckets stay visible on a dark ground. The red and
+       the grey are a touch lighter than they were, so the ink labels set on
+       them clear 4.5:1 — see the -on tokens below. */
+    --bias-far-left: #ea5c60;
     --bias-left: #ee6b1f;
-    --bias-center: #7a8288;
+    --bias-center: #8a9299;
     --bias-right: #3b82f6;
     --bias-far-right: #4f63c4;
+
+    /* Every colour above is lifted for this ground, so ink reads better on all
+       of them except the deepest blue. */
+    --bias-far-left-on: #1a1418;
+    --bias-left-on: #1a1418;
+    --bias-center-on: #1a1418;
+    --bias-right-on: #1a1418;
+    --bias-far-right-on: #ffffff;
   }
 }
 
 :root[data-theme="dark"] {
-  --bg: #14171a;
-  --surface: #1b1f23;
-  --surface-2: #23282d;
-  --surface-3: #2b3137;
-  --ink: #eceae3;
-  --ink-dim: #a7adb0;
-  --ink-faint: #767c80;
-  --rule: #32383e;
-  --rule-strong: #3d444b;
-  --brand: #7fb2c2;
-  --brand-ink: #cfe6ec;
-  --brand-tint: #1e333a;
-  --amber: #e3a55c;
-  --amber-tint: #3a2e1c;
+  --bg: #151114;
+  --surface: #1c171b;
+  --surface-2: #241e23;
+  --surface-3: #2e262c;
+  --ink: #ece7ea;
+  --ink-dim: #aaa0a6;
+  --ink-faint: #877d83;
+  --rule: #322a30;
+  --rule-strong: #43393f;
+  --brand: #d9a3c4;
+  --brand-ink: #f0dce8;
+  --brand-tint: #2a1a24;
+  --amber: #d9b65c;
+  --amber-tint: #332b15;
 
-  --bias-far-left: #e5484d;
+  --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-2: 0 2px 4px rgba(0, 0, 0, 0.4), 0 6px 16px rgba(0, 0, 0, 0.36);
+  --shadow-3: 0 4px 10px rgba(0, 0, 0, 0.45), 0 18px 40px rgba(0, 0, 0, 0.5);
+
+  --bias-far-left: #ea5c60;
   --bias-left: #ee6b1f;
-  --bias-center: #7a8288;
+  --bias-center: #8a9299;
   --bias-right: #3b82f6;
   --bias-far-right: #4f63c4;
+
+  --bias-far-left-on: #1a1418;
+  --bias-left-on: #1a1418;
+  --bias-center-on: #1a1418;
+  --bias-right-on: #1a1418;
+  --bias-far-right-on: #ffffff;
 }
 
 html,
@@ -92,6 +159,11 @@ body {
   color: var(--ink);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
+  /* The landing hero breaks out of the page shell with 100vw, which overflows
+     by the width of the scrollbar. `clip` trims that without turning the body
+     into a scroll container the way `hidden` would — which would break the
+     sticky masthead. */
+  overflow-x: clip;
 }
 
 :focus-visible {
@@ -117,3 +189,79 @@ body {
     font-variant-numeric: tabular-nums;
   }
 }
+
+/* ---------------------------------------------------------------------------
+   Landing page entrance.
+
+   One sequence that runs once on load, rather than anything that loops. The
+   order is the argument the page makes: the claim arrives, the scale it rests
+   on draws itself, the evidence drops into place behind it, and the way in
+   appears last.
+
+   Every step is `both`, so each element holds its opening frame until its turn
+   and its closing frame afterwards — nothing flickers at full opacity before
+   the sequence reaches it.
+
+   The reduced-motion rule above collapses every duration to near zero, which
+   with `both` lands each element on its final frame immediately. The page is
+   then simply there, correctly arranged, which is the right answer for anyone
+   who asked not to be moved at.
+--------------------------------------------------------------------------- */
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes draw-x {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+/* Cards start further from true — lower, smaller and turned about twice as
+   far — so they read as settling into the pile rather than fading up on the
+   spot. `--rotate` is the resting angle, set per card. */
+@keyframes settle-in {
+  from {
+    opacity: 0;
+    transform: translateY(52px) scale(0.9) rotate(calc(var(--rotate, 0deg) * 2.4));
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1) rotate(var(--rotate, 0deg));
+  }
+}
+
+.rise-in {
+  animation: rise-in 700ms cubic-bezier(0.22, 0.8, 0.28, 1) both;
+  animation-delay: var(--delay, 0ms);
+}
+
+.draw-x {
+  transform-origin: left center;
+  animation: draw-x 620ms cubic-bezier(0.22, 0.8, 0.28, 1) both;
+  animation-delay: var(--delay, 0ms);
+}
+
+.settle-in {
+  transform: rotate(var(--rotate, 0deg));
+  animation: settle-in 900ms cubic-bezier(0.18, 0.85, 0.24, 1) both;
+  animation-delay: var(--delay, 0ms);
+}
+
+/* The shine border lives entirely in ShineBorder.tsx and tailwind.config.ts:
+   the masks are inline styles, and the `shine` keyframes are a theme entry so
+   the component can say `motion-safe:animate-shine` and opt out of motion
+   properly rather than leaning on the blanket duration override above.
+   Changing those keyframes needs a dev-server restart — the config module is
+   cached, so editing it alone will not rebuild the CSS. */
+

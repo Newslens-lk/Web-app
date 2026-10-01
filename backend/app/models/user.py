@@ -15,6 +15,9 @@ class User(Base):
     password_hash: Mapped[str] = mapped_column(String(256), nullable=False)
     role: Mapped[str] = mapped_column(String(20), default="user", nullable=False)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+    # Interface language chosen at signup, so email matches what they read on
+    # the site. "en" or "si"; see frontend/src/lib/i18n/config.ts.
+    locale: Mapped[str] = mapped_column(String(5), default="en", nullable=False)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )

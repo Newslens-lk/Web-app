@@ -2,12 +2,15 @@
 
 import { useEffect, useState } from "react";
 
+import { useI18n } from "@/lib/i18n/client";
+
 type Mode = "12" | "24";
 
 // Pure-frontend widget. No backend involvement — reads the client machine's
 // clock via `new Date()` and re-renders every second. `Intl.DateTimeFormat`
 // picks up the visitor's locale + timezone automatically.
 export function DigitalClock() {
+  const { locale, t } = useI18n();
   const [now, setNow] = useState<Date | null>(null);
   const [mode, setMode] = useState<Mode>("12");
 
@@ -26,7 +29,7 @@ export function DigitalClock() {
     return (
       <div
         aria-hidden
-        className="bg-surface border border-rule rounded-[10px] p-5 min-h-[168px]"
+        className="bg-surface border border-rule rounded-[3px] p-5 min-h-[168px]"
       />
     );
   }
@@ -34,7 +37,7 @@ export function DigitalClock() {
   const h24 = now.getHours();
   const mm = String(now.getMinutes()).padStart(2, "0");
   const ss = String(now.getSeconds()).padStart(2, "0");
-  const suffix = h24 >= 12 ? "PM" : "AM";
+  const suffix = h24 >= 12 ? t.widgets.pm : t.widgets.am;
   const h12 = h24 % 12 || 12;
 
   const timeMain =
@@ -42,28 +45,31 @@ export function DigitalClock() {
       ? `${String(h24).padStart(2, "0")}:${mm}:${ss}`
       : `${String(h12).padStart(2, "0")}:${mm}:${ss}`;
 
-  const dateLine = now.toLocaleDateString(undefined, {
+  // Follow the chosen interface language rather than the browser's, so the
+  // month and weekday names match the rest of the page.
+  const dateLocale = locale === "si" ? "si-LK" : "en-LK";
+  const dateLine = now.toLocaleDateString(dateLocale, {
     year: "numeric",
     month: "long",
     day: "numeric",
   });
-  const weekday = now.toLocaleDateString(undefined, { weekday: "long" });
+  const weekday = now.toLocaleDateString(dateLocale, { weekday: "long" });
 
   return (
-    <div className="bg-surface border border-rule rounded-[10px] p-5">
+    <div className="rounded-[3px] border border-rule bg-surface p-5 shadow-1">
       <div className="flex justify-between items-start gap-3 mb-4">
         <div>
           <div className="text-xs font-bold uppercase tracking-wider text-ink-faint">
-            Digital Clock
+            {t.widgets.clock}
           </div>
-          <div className="text-[11px] text-ink-faint mt-1">
-            Updates every second · local time
+          <div className="text-xs text-ink-faint mt-1">
+            {t.widgets.clockSubtitle}
           </div>
         </div>
         <div
           role="group"
-          aria-label="Time format"
-          className="inline-flex bg-surface-2 rounded-full p-0.5 text-[11px] font-semibold flex-none"
+          aria-label={t.widgets.timeFormat}
+          className="inline-flex bg-surface-2 rounded-full p-0.5 text-xs font-semibold flex-none"
         >
           {(["12", "24"] as const).map((m) => (
             <button
@@ -77,7 +83,7 @@ export function DigitalClock() {
                   : "text-ink-dim hover:text-ink"
               }`}
             >
-              {m} hr
+              {m === "12" ? t.widgets.hour12 : t.widgets.hour24}
             </button>
           ))}
         </div>
@@ -85,19 +91,19 @@ export function DigitalClock() {
 
       <div className="flex items-end justify-between gap-3 flex-wrap">
         <div
-          className="font-mono tabular-nums text-[38px] leading-none font-bold text-ink"
+          className="font-mono tabular-nums text-2xl leading-none font-bold text-ink"
           aria-live="off"
         >
           {timeMain}
           {mode === "12" && (
-            <span className="text-[14px] font-semibold text-ink-dim ml-1.5">
+            <span className="text-base font-semibold text-ink-dim ml-1.5">
               {suffix}
             </span>
           )}
         </div>
         <div className="text-right">
-          <div className="text-[13px] text-ink">{dateLine}</div>
-          <div className="text-[13px] text-ink-dim">{weekday}</div>
+          <div className="text-sm text-ink">{dateLine}</div>
+          <div className="text-sm text-ink-dim">{weekday}</div>
         </div>
       </div>
     </div>

@@ -114,3 +114,20 @@ def test_min_sources_filter_is_applied_to_the_query(client, override_get_db):
 
     assert "source_count" in compiled_sql
     assert " >= 3" in compiled_sql
+
+
+def test_event_image_skips_publisher_placeholder(client, override_get_db):
+    rows = [
+        ("First", "lankadeepa", "center", "https://cdn.lk/image_8df7de9e07.png"),
+        ("Second", "hiru", "center", "https://cdn.lk/article.jpg"),
+    ]
+    override_get_db(make_fake_db(1, [make_fake_event()], [rows]))
+    assert client.get("/api/events").json()["events"][0]["image_url"] == (
+        "https://cdn.lk/article.jpg"
+    )
+
+
+def test_event_with_only_placeholder_has_no_image(client, override_get_db):
+    rows = [("First", "lankadeepa", "center", "https://cdn.lk/image_8df7de9e07.png")]
+    override_get_db(make_fake_db(1, [make_fake_event()], [rows]))
+    assert client.get("/api/events").json()["events"][0]["image_url"] is None

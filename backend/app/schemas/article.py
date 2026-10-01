@@ -1,10 +1,21 @@
 from datetime import datetime
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, field_validator
+
+from app.core.article_images import usable_image_url
 
 
-class ArticleSummary(BaseModel):
+class ImageResponse(BaseModel):
+    image_url: str | None = None
+
+    @field_validator("image_url")
+    @classmethod
+    def filter_image(cls, value: str | None) -> str | None:
+        return usable_image_url(value)
+
+
+class ArticleSummary(ImageResponse):
     model_config = ConfigDict(from_attributes=True)
 
     article_id: str
@@ -19,7 +30,7 @@ class ArticleSummary(BaseModel):
     event_id: UUID | None
 
 
-class ArticleDetail(BaseModel):
+class ArticleDetail(ImageResponse):
     model_config = ConfigDict(from_attributes=True)
 
     article_id: str
@@ -37,7 +48,7 @@ class ArticleDetail(BaseModel):
     event_id: UUID | None
 
 
-class ArticleInEvent(BaseModel):
+class ArticleInEvent(ImageResponse):
     model_config = ConfigDict(from_attributes=True)
 
     article_id: str

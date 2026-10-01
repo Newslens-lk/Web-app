@@ -23,6 +23,7 @@ const config: Config = {
       lg: ["24px", { lineHeight: "1.22", letterSpacing: "-0.015em" }],
       xl: ["32px", { lineHeight: "1.12", letterSpacing: "-0.022em" }],
       "2xl": ["44px", { lineHeight: "1.05", letterSpacing: "-0.03em" }],
+      "3xl": ["56px", { lineHeight: "1.08", letterSpacing: "-0.035em" }],
     },
     extend: {
       keyframes: {
@@ -64,7 +65,7 @@ const config: Config = {
         mono: ["var(--font-mono)"],
       },
       maxWidth: {
-        shell: "1180px",
+        shell: "1440px",
       },
       boxShadow: {
         // Driven by CSS variables so dark mode can swap the whole scale —

@@ -4,7 +4,6 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 
 import { getCurrentUser } from "@/lib/api";
-import { ShineBorder } from "@/components/ShineBorder";
 import { useI18n } from "@/lib/i18n/client";
 import type { User } from "@/lib/types";
 
@@ -40,8 +39,7 @@ export default function AccountPage() {
     <div className="rise-in max-w-lg py-8">
       <p className="text-sm font-semibold uppercase tracking-eyebrow text-amber">{t.account.kicker}</p>
       <h1 className="mt-2 font-serif text-xl font-semibold">{user.display_name}</h1>
-      <div className="relative mt-6 overflow-hidden rounded-[3px] border border-rule bg-surface p-5 text-base shadow-1">
-        <ShineBorder borderWidth={1} duration={14} shineColor={["#5b2545", "#d9b65c", "#d9a3c4"]} />
+      <div className="relative mt-6 overflow-hidden rounded-none border border-rule bg-surface p-5 text-base shadow-1">
         <p><span className="text-ink-dim">{t.account.email}</span> {user.email}</p>
         <p className="mt-2"><span className="text-ink-dim">{t.account.type}</span> {t.account.regularUser}</p>
       </div>

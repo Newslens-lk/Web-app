@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { getSources } from "@/lib/api";
-import { ShineBorder } from "@/components/ShineBorder";
 import { SourceBadge } from "@/components/SourceBadge";
 import { relativeTime } from "@/lib/api";
 import { getDictionary } from "@/lib/i18n/server";
@@ -11,23 +10,15 @@ export default async function SourcesPage() {
 
   return (
     <div className="rise-in">
-      <h1 className="font-serif text-lg font-semibold mb-6">{t.sources.title}</h1>
+      <h1 className="edition-heading">{t.sources.title}</h1>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {sources.map((source, i) => (
+        {sources.map((source) => (
           <Link
             key={source.source_name}
             href={`/articles?source=${encodeURIComponent(source.source_name)}`}
-            className="relative flex flex-col gap-2 overflow-hidden rounded-[3px] border border-rule bg-surface p-5 shadow-1 transition-[box-shadow,transform,border-color] duration-200 ease-out hover:-translate-y-0.5 hover:border-rule-strong hover:shadow-2"
+            className="relative flex flex-col gap-2 overflow-hidden rounded-none border border-rule bg-surface p-5 shadow-1 transition-[box-shadow,transform,border-color] duration-200 ease-out hover:border-rule-strong hover:shadow-2"
           >
-            {/* Each card runs a second longer than the one before it. Identical
-                durations would put all five in lockstep, which reads as one
-                mechanism rather than five separate outlets. */}
-            <ShineBorder
-              borderWidth={2}
-              duration={11 + i}
-              shineColor={["#5b2545", "#d9b65c", "#d9a3c4"]}
-            />
             {/* Tile and name on one line, everything about the outlet indented
                 under the name — so the eye runs down the column of tiles and
                 the detail hangs off it, rather than each card starting over. */}

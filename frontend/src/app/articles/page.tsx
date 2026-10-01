@@ -4,7 +4,7 @@ import { getArticles, relativeTime } from "@/lib/api";
 import { BiasLabel } from "@/components/BiasLabel";
 import { ArticleFilters } from "@/components/ArticleFilters";
 import { ArticleImage } from "@/components/ArticleImage";
-import { ShineBorder } from "@/components/ShineBorder";
+import { ImagelessPanel } from "@/components/ImagelessPanel";
 import { sourceDisplayName } from "@/lib/constants";
 import { getDictionary } from "@/lib/i18n/server";
 import type { BiasLabel as BiasLabelType } from "@/lib/types";
@@ -46,18 +46,15 @@ export default async function ArticlesPage({ searchParams }: Props) {
         ← {t.articles.backToSources}
       </Link>
 
-      <div className="mt-5 mb-6">
-        <p className="text-sm font-semibold uppercase tracking-eyebrow text-amber">
-          {t.articles.kicker}
-        </p>
-        <h1 className="mt-2 font-serif text-xl font-semibold">
+      <div className="mt-4 mb-6">
+        <h1 className="font-serif text-xl font-semibold">
           {biasLabel
             ? t.articles.filtered(t.bias[biasLabel as BiasLabelType] ?? biasLabel.replaceAll("_", " "))
             : source
               ? t.articles.filtered(sourceDisplayName(source))
               : t.articles.allArticles}
         </h1>
-        <p className="mt-2 text-base text-ink-dim">{t.articles.intro}</p>
+        <p className="mt-1 text-sm text-ink-dim">{t.articles.count(result.total)}</p>
       </div>
 
       <ArticleFilters
@@ -68,26 +65,29 @@ export default async function ArticlesPage({ searchParams }: Props) {
         dateTo={dateTo}
       />
 
-      <div className="space-y-3">
+      <div className="grid gap-x-8 gap-y-10 md:grid-cols-2 lg:grid-cols-3">
         {result.articles.map((article) => (
           <article
             key={article.article_id}
-            className="relative overflow-hidden rounded-[3px] border border-rule bg-surface p-4 shadow-1"
+            className="editorial-story group relative overflow-hidden border-b border-rule pb-6"
           >
-            <ShineBorder
-              borderWidth={1}
-              duration={13 + (article.article_id.charCodeAt(0) % 5)}
-              shineColor={["#5b2545", "#d9b65c", "#d9a3c4"]}
-            />
             <ArticleImage
               src={article.image_url}
               alt={article.title}
-              className="mb-3 h-40 w-full rounded-md object-cover"
+              className="mb-5 h-56 w-full rounded-md object-cover"
+              fallback={
+                <ImagelessPanel
+                  title={article.title}
+                  source={article.source_name}
+                  biasLabel={article.bias_label}
+                  className="mb-5 h-56 w-full rounded-md"
+                />
+              }
             />
             <div className="flex flex-wrap items-center gap-2">
               <BiasLabel label={article.bias_label} confidence={article.bias_confidence} />
             </div>
-            <h2 className="mt-2 font-serif text-md font-semibold leading-snug">
+            <h2 className="mt-2 font-serif text-md font-semibold leading-snug group-has-[[data-imageless]]:hidden">
               {article.title}
             </h2>
             {article.body_excerpt && (

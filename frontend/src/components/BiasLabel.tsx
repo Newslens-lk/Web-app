@@ -12,8 +12,7 @@ export function BiasLabel({ label, confidence }: Props) {
   if (!label) return null;
   return (
     <span
-      // Text colour comes from the palette rather than being white: white on
-      // the orange at the left of the scale is 3.5:1, which is not readable.
+      // Use each theme's contrasting text color on the muted bias swatch.
       className="inline-flex items-center gap-1.5 rounded-[2px] px-2 py-[3px] text-xs font-semibold uppercase tracking-wide"
       style={{
         backgroundColor: BIAS_COLORS[label] ?? "var(--bias-center)",

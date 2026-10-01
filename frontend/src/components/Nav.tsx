@@ -17,6 +17,7 @@ export function Nav() {
     // The feed, not the landing page at "/" — the label is unchanged, only
     // where it points.
     { href: "/home", label: t.nav.home },
+    { href: "/articles", label: t.articles.allArticles },
     { href: "/sources", label: t.nav.sources },
     { href: "/analytics", label: t.nav.analytics },
   ];
@@ -31,7 +32,7 @@ export function Nav() {
   }
 
   return (
-    <nav aria-label={t.nav.label} className="ml-auto flex flex-wrap gap-1">
+    <nav aria-label={t.nav.label} className="flex flex-wrap items-center gap-x-4 gap-y-2">
       {[...links, ...(user
         ? [{ href: user.role === "admin" ? "/admin" : "/account", label: user.role === "admin" ? t.nav.admin : t.nav.account }]
         : [])].map((link) => {
@@ -42,10 +43,10 @@ export function Nav() {
             href={link.href}
             aria-current={active ? "page" : undefined}
             className={[
-              "rounded-md border border-transparent px-3 py-2 text-sm font-semibold whitespace-nowrap transition-colors",
+              "border-b py-2 text-xs uppercase tracking-wide whitespace-nowrap transition-colors",
               active
-                ? "bg-brand-tint text-brand-ink"
-                : "text-ink-dim hover:bg-surface-2 hover:text-ink",
+                ? "border-ink text-ink"
+                : "border-transparent text-ink-dim hover:border-ink hover:text-ink",
             ].join(" ")}
           >
             {link.label}
@@ -56,14 +57,14 @@ export function Nav() {
         <button
           type="button"
           onClick={handleLogout}
-          className="rounded-md border border-transparent px-3 py-2 text-sm font-semibold text-ink-dim hover:bg-surface-2 hover:text-ink"
+          className="py-2 text-xs uppercase tracking-wide text-ink-dim hover:text-ink"
         >
           {t.nav.logOut}
         </button>
       ) : (
         <Link
           href="/login"
-          className="rounded-md bg-brand px-3 py-2 text-sm font-semibold text-white hover:opacity-90"
+          className="py-2 text-xs uppercase tracking-wide text-ink hover:underline"
         >
           {t.nav.logIn}
         </Link>

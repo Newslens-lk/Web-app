@@ -100,12 +100,12 @@ export const en = {
     twoPlusSources: "2+ sources",
     threePlusSources: "3+ sources",
     searchNews: "Search news",
-    searchPlaceholder: "Search headlines or article text",
+    searchPlaceholder: "Search headlines and stories",
     bias: "Bias",
-    allBiasLabels: "All bias labels",
+    allBiasLabels: "Any bias",
     from: "From",
     to: "To",
-    apply: "Apply filters",
+    apply: "Search",
     clear: "Clear",
   },
 
@@ -128,10 +128,9 @@ export const en = {
 
   articles: {
     backToSources: "Back to Sources",
-    kicker: "Raw scraped news",
     allArticles: "All articles",
     filtered: (what: string) => `${what} articles`,
-    intro: "These are individual articles collected before event clustering.",
+    count: (n: number) => `${n.toLocaleString()} article${n !== 1 ? "s" : ""}`,
     empty: "No raw articles found.",
     pages: "Article pages",
   },
@@ -321,10 +320,10 @@ export const si: Dictionary = {
     searchNews: "ප්‍රවෘත්ති සොයන්න",
     searchPlaceholder: "සිරස්තල හෝ ලිපියේ අන්තර්ගතය සොයන්න",
     bias: "නැඹුරුව",
-    allBiasLabels: "සියලු නැඹුරු ලේබල",
+    allBiasLabels: "ඕනෑම නැඹුරුවක්",
     from: "සිට",
     to: "දක්වා",
-    apply: "පෙරහන් යොදන්න",
+    apply: "සොයන්න",
     clear: "ඉවත් කරන්න",
   },
 
@@ -347,10 +346,9 @@ export const si: Dictionary = {
 
   articles: {
     backToSources: "මාධ්‍ය ආයතන වෙත ආපසු",
-    kicker: "රැස් කළ අමු ප්‍රවෘත්ති",
     allArticles: "සියලු ලිපි",
     filtered: (what: string) => `${what} ලිපි`,
-    intro: "මේවා සිදුවීම් වශයෙන් කාණ්ඩගත කිරීමට පෙර රැස් කරන ලද තනි ලිපි වේ.",
+    count: (n: number) => `ලිපි ${n.toLocaleString()}ක්`,
     empty: "අමු ලිපි හමු නොවීය.",
     pages: "ලිපි පිටු",
   },

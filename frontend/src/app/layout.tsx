@@ -52,9 +52,9 @@ export const viewport: Viewport = {
 
 // Applies a stored theme choice before the first paint, so a reader who picked
 // dark never sees a flash of the light palette. Runs synchronously in <head>
-// and stays silent if storage is unavailable. With nothing stored it leaves the
-// attribute off and the prefers-color-scheme rules in globals.css take over.
-const themeScript = `(function(){try{var t=localStorage.getItem("theme");if(t==="dark"||t==="light"){document.documentElement.dataset.theme=t;}}catch(e){}})();`;
+// and stays silent if storage is unavailable. New readers see the light paper
+// edition; an explicit saved preference still takes precedence.
+const themeScript = `(function(){var t="light";try{var s=localStorage.getItem("theme");if(s==="dark"||s==="light")t=s;}catch(e){}document.documentElement.dataset.theme=t;})();`;
 
 export default function RootLayout({
   children,

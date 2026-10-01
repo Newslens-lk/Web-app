@@ -14,8 +14,8 @@ type Props = {
   dateTo?: string;
 };
 
-const inputClass =
-  "rounded-md border border-rule-strong bg-surface px-3 py-[9px] text-sm text-ink placeholder:text-ink-faint";
+const bareClass =
+  "cursor-pointer bg-transparent py-1 font-semibold text-ink hover:text-brand";
 
 function inputDateValue(value?: string) {
   return value?.slice(0, 10) ?? "";
@@ -54,60 +54,48 @@ export function ArticleFilters({ search, source, biasLabel, dateFrom, dateTo }: 
   return (
     <form
       onSubmit={submit}
-      className="mb-6 rounded-[3px] border border-rule bg-surface p-4 shadow-1"
+      className="mb-8 flex flex-wrap items-center gap-x-5 gap-y-3 border-y border-rule py-3 text-sm"
     >
-      <div className="grid gap-3 md:grid-cols-[minmax(220px,1.5fr)_1fr_1fr]">
-        <label className="flex flex-col gap-1.5 text-sm font-semibold text-ink-dim">
-          {t.filters.searchNews}
-          <input
-            name="search"
-            type="search"
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder={t.filters.searchPlaceholder}
-            className={inputClass}
-          />
-        </label>
+      <input
+        name="search"
+        type="search"
+        value={query}
+        onChange={(event) => setQuery(event.target.value)}
+        placeholder={t.filters.searchPlaceholder}
+        aria-label={t.filters.searchNews}
+        className="min-w-[220px] flex-1 border-b border-transparent bg-transparent py-1 text-base text-ink placeholder:text-ink-faint focus:border-ink focus:outline-none"
+      />
 
-        <label className="flex flex-col gap-1.5 text-sm font-semibold text-ink-dim">
-          {t.filters.source}
-          <select name="source" defaultValue={source ?? ""} className={inputClass}>
-            <option value="">{t.filters.allSources}</option>
-            {Object.entries(SOURCE_DISPLAY).map(([value, label]) => (
-              <option key={value} value={value}>{label}</option>
-            ))}
-          </select>
-        </label>
+      <select name="source" defaultValue={source ?? ""} aria-label={t.filters.source} className={bareClass}>
+        <option value="">{t.filters.allSources}</option>
+        {Object.entries(SOURCE_DISPLAY).map(([value, label]) => (
+          <option key={value} value={value}>{label}</option>
+        ))}
+      </select>
 
-        <label className="flex flex-col gap-1.5 text-sm font-semibold text-ink-dim">
-          {t.filters.bias}
-          <select name="bias_label" defaultValue={biasLabel ?? ""} className={inputClass}>
-            <option value="">{t.filters.allBiasLabels}</option>
-            {BIAS_LABELS.map((value) => (
-              <option key={value} value={value}>{t.bias[value]}</option>
-            ))}
-          </select>
-        </label>
-      </div>
+      <select name="bias_label" defaultValue={biasLabel ?? ""} aria-label={t.filters.bias} className={bareClass}>
+        <option value="">{t.filters.allBiasLabels}</option>
+        {BIAS_LABELS.map((value) => (
+          <option key={value} value={value}>{t.bias[value]}</option>
+        ))}
+      </select>
 
-      <div className="mt-3 flex flex-wrap items-end gap-3">
-        <label className="flex flex-col gap-1.5 text-sm font-semibold text-ink-dim">
-          {t.filters.from}
-          <input name="date_from" type="date" defaultValue={inputDateValue(dateFrom)} className={inputClass} />
-        </label>
-        <label className="flex flex-col gap-1.5 text-sm font-semibold text-ink-dim">
-          {t.filters.to}
-          <input name="date_to" type="date" defaultValue={inputDateValue(dateTo)} className={inputClass} />
-        </label>
-        <button type="submit" className="rounded-md bg-brand px-4 py-[10px] text-sm font-semibold text-white hover:opacity-90">
+      <span className="flex items-center gap-1.5 text-ink-dim">
+        <input name="date_from" type="date" defaultValue={inputDateValue(dateFrom)} aria-label={t.filters.from} className={bareClass} />
+        <span aria-hidden>–</span>
+        <input name="date_to" type="date" defaultValue={inputDateValue(dateTo)} aria-label={t.filters.to} className={bareClass} />
+      </span>
+
+      <span className="flex items-center gap-4">
+        <button type="submit" className="rounded-[3px] bg-brand px-3 py-1.5 font-semibold text-white hover:opacity-90">
           {t.filters.apply}
         </button>
         {(search || source || biasLabel || dateFrom || dateTo) && (
-          <button type="button" onClick={clear} className="px-2 py-[10px] text-sm font-semibold text-ink-dim hover:text-ink">
+          <button type="button" onClick={clear} className="text-ink-dim underline underline-offset-2 hover:text-ink">
             {t.filters.clear}
           </button>
         )}
-      </div>
+      </span>
     </form>
   );
 }

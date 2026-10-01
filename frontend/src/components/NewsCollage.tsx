@@ -40,7 +40,7 @@ export function NewsCollage({ articles }: Props) {
   return (
     <div
       aria-hidden
-      className="pointer-events-none absolute inset-0 hidden select-none lg:block"
+      className="pointer-events-none absolute inset-0 z-0 hidden select-none lg:block"
     >
       {SLOTS.map((slot, i) => {
         const article = articles[i % articles.length];
@@ -72,7 +72,7 @@ function CollageCard({
 
   return (
     <article
-      className={`settle-in absolute ${slot.width} ${slot.z} overflow-hidden rounded-[3px] bg-[#F3F1F2] text-[#1A1418] shadow-3`}
+      className={`editorial-story settle-in absolute ${slot.width} ${slot.z} overflow-hidden border border-rule-strong bg-surface text-ink shadow-3`}
       style={
         {
           left: slot.left,
@@ -92,7 +92,7 @@ function CollageCard({
       <div className="flex flex-col gap-2 p-4">
         <div className="flex items-center gap-2">
           <span className="h-3 w-[3px] shrink-0" style={{ backgroundColor: edge }} />
-          <span className="text-xs font-semibold uppercase tracking-eyebrow text-[#574B53]">
+          <span className="text-xs font-semibold uppercase tracking-eyebrow text-ink-dim">
             {sourceDisplayName(article.source_name)}
           </span>
         </div>

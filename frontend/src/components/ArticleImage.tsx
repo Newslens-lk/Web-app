@@ -1,22 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 
-type Props = { src: string | null; alt: string; className?: string };
+type Props = { src: string | null; alt: string; className?: string; fallback?: ReactNode };
 
-export function ArticleImage({ src, alt, className = "" }: Props) {
+export function ArticleImage({ src, alt, className = "", fallback = null }: Props) {
   const [failedSrc, setFailedSrc] = useState<string | null>(null);
-  if (!src || src === failedSrc) {
-    return (
-      <div
-        role="img"
-        aria-label="No image available"
-        className={`${className} flex items-center justify-center bg-surface-2 text-ink-faint text-sm`}
-      >
-        No image available
-      </div>
-    );
-  }
+  if (!src || src === failedSrc) return <>{fallback}</>;
 
   return (
     // eslint-disable-next-line @next/next/no-img-element

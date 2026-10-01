@@ -15,10 +15,8 @@ export const BIAS_COLORS: Record<BiasLabel, string> = {
 /**
  * The text colour to use *on* each bias colour.
  *
- * Not always white: the orange at the left of the scale fails contrast under
- * white text (3.5:1), and in dark mode the lifted reds and greys do too. Each
- * pairing is resolved per theme in globals.css so a label is always readable
- * on the colour behind it.
+ * White text sits on the darker light-mode swatches; charcoal text sits on
+ * the lifted dark-mode swatches. Pairings are defined in globals.css.
  */
 export const BIAS_ON_COLORS: Record<BiasLabel, string> = {
   far_left: "var(--bias-far-left-on)",
@@ -46,7 +44,7 @@ export const SOURCE_LOGOS: Record<string, string> = {
   bbc_sinhala: "/logos/bbc_sinhala.webp",
   lankadeepa: "/logos/lankadeepa.png",
   newsfirst: "/logos/newsfirst.jpg",
-  divaina: "/logos/divaina.png",
+  divaina: "/logos/divaina-icon.png",
 };
 
 export const SOURCE_DISPLAY: Record<string, string> = {

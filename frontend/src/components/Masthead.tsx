@@ -2,35 +2,17 @@ import Link from "next/link";
 import { Nav } from "./Nav";
 import { ThemeToggle } from "./ThemeToggle";
 import { LanguageToggle } from "./LanguageToggle";
-import { BIAS_COLORS, BIAS_LABELS } from "@/lib/constants";
+import { getDictionary } from "@/lib/i18n/server";
 
 export function Masthead() {
+  const t = getDictionary();
   return (
-    <header className="sticky top-0 z-30 border-b border-rule bg-surface">
-      <div className="mx-auto flex max-w-shell items-center gap-5 px-4 py-3.5 sm:px-6">
-        <Link
-          href="/"
-          className="font-serif text-xl font-semibold leading-none tracking-[-0.03em]"
-        >
-          news<span className="text-brand">Lens</span>
-        </Link>
-        <Nav />
-        <LanguageToggle />
-        <ThemeToggle />
-      </div>
-
-      {/* The scale itself, drawn once at the top of every page: the reader
-          meets the five positions before the first headline, and every colour
-          below refers back to this line. Two pixels, and the only place the
-          full spectrum appears at equal weight. */}
-      <div className="flex h-[2px] w-full" aria-hidden>
-        {BIAS_LABELS.map((label) => (
-          <span
-            key={label}
-            className="h-full flex-1"
-            style={{ backgroundColor: BIAS_COLORS[label] }}
-          />
-        ))}
+    <header className="border-b border-rule bg-bg">
+      <div className="edition-strip">{t.landing.kicker}</div>
+      <div className="masthead-grid mx-auto max-w-shell px-4 sm:px-6">
+        <Link href="/" className="masthead-logo">NewsLens.</Link>
+        <div className="masthead-nav"><Nav /></div>
+        <div className="masthead-tools"><LanguageToggle /><ThemeToggle /></div>
       </div>
     </header>
   );

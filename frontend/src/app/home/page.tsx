@@ -33,8 +33,6 @@ export default async function HomePage({ searchParams }: Props) {
   const ranked = onFirstPage
     ? [...eventList.events].sort((a, b) => b.source_count - a.source_count)
     : eventList.events;
-  const lead = onFirstPage ? ranked[0] : undefined;
-  const rest = onFirstPage ? ranked.slice(1) : ranked;
   const pageUrl = (page: number) => {
     const query = new URLSearchParams();
     for (const [key, value] of Object.entries(searchParams)) {
@@ -46,6 +44,7 @@ export default async function HomePage({ searchParams }: Props) {
 
   return (
     <>
+      <h1 className="edition-heading">{t.home.latestEvents}</h1>
       {/* The page arrives in three bands — what is here, how to narrow it,
           then the stories. Short delays: this is a page to read, not a cover,
           and anything slower would be in the way by the third visit. */}
@@ -71,7 +70,7 @@ export default async function HomePage({ searchParams }: Props) {
           column shrink below its content width, so long Sinhala headlines
           wrap instead of forcing the page to scroll sideways. */}
       <div
-        className="rise-in grid gap-6 lg:grid-cols-[minmax(0,1fr)_300px]"
+        className="rise-in grid gap-5 lg:grid-cols-[minmax(0,1fr)_260px]"
         style={{ "--delay": "160ms" } as CSSProperties}
       >
         <div>
@@ -84,17 +83,9 @@ export default async function HomePage({ searchParams }: Props) {
             </span>
           </div>
 
-          {/* The most-covered story leads at full width; the rest follow in
-              two columns. Which story leads is decided by the data — see the
-              sort below — not by whichever happens to be newest. */}
-          {lead && (
-            <div className="mb-8">
-              <EventCard event={lead} lead />
-            </div>
-          )}
-
-          <div className="grid gap-x-6 gap-y-8 sm:grid-cols-2">
-            {rest.map((event) => (
+          {/* Keep the coverage ranking, with consistently compact cards. */}
+          <div className="grid items-start gap-4 sm:grid-cols-2 xl:grid-cols-3">
+            {ranked.map((event) => (
               <EventCard key={event.event_id} event={event} />
             ))}
           </div>

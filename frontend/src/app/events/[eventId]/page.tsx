@@ -6,7 +6,7 @@ import { BiasLabel } from "@/components/BiasLabel";
 import { SourceBadge } from "@/components/SourceBadge";
 import { getDateLocale, getDictionary } from "@/lib/i18n/server";
 import { ArticleImage } from "@/components/ArticleImage";
-import { ShineBorder } from "@/components/ShineBorder";
+import { ImagelessPanel } from "@/components/ImagelessPanel";
 
 type Props = { params: { eventId: string } };
 
@@ -23,7 +23,7 @@ export default async function EventDetailPage({ params }: Props) {
   const headline = detail.summary ?? detail.articles[0]?.title ?? t.event.untitled;
 
   return (
-    <div className="rise-in max-w-[900px] py-4">
+    <div className="rise-in w-full min-w-0 py-4">
       <Link
         href="/home"
         className="inline-block text-sm font-semibold text-brand hover:underline mb-4"
@@ -59,37 +59,40 @@ export default async function EventDetailPage({ params }: Props) {
       </div>
 
       <h2 className="text-base font-semibold mt-8 mb-4">{t.event.articles}</h2>
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
         {detail.articles.map((article) => (
           <div
             key={article.article_id}
-            className="relative flex flex-col gap-2 overflow-hidden rounded-[3px] border border-rule bg-surface p-4 shadow-1"
+            className="group relative flex min-w-0 flex-col gap-3 overflow-hidden rounded-none border border-rule bg-surface p-4 shadow-1"
           >
-            <ShineBorder
-              borderWidth={1}
-              duration={13 + (article.article_id.charCodeAt(0) % 5)}
-              shineColor={["#5b2545", "#d9b65c", "#d9a3c4"]}
-            />
             <ArticleImage
               src={article.image_url}
               alt={article.title}
-              className="h-40 w-full rounded-md object-cover"
+              className="aspect-video w-full object-cover"
+              fallback={
+                <ImagelessPanel
+                  title={article.title}
+                  source={article.source_name}
+                  biasLabel={article.bias_label}
+                  className="aspect-video w-full"
+                />
+              }
             />
-            <div className="flex items-center justify-between gap-2">
+            <div className="flex flex-wrap items-center justify-between gap-2">
               <SourceBadge name={article.source_name} showName />
               <BiasLabel
                 label={article.bias_label}
                 confidence={article.bias_confidence}
               />
             </div>
-            <h3 className="font-serif text-base font-semibold leading-snug text-balance">
+            <h3 className="font-serif text-base font-semibold leading-snug text-balance group-has-[[data-imageless]]:hidden">
               {article.title}
             </h3>
             <p className="text-sm text-ink-dim leading-relaxed line-clamp-4">
               {article.body.slice(0, 200)}
               {article.body.length > 200 && "…"}
             </p>
-            <div className="flex items-center justify-between mt-auto pt-2 text-sm text-ink-faint">
+            <div className="mt-auto flex flex-wrap items-center justify-between gap-2 pt-2 text-sm text-ink-faint">
               <span>
                 {article.published_at
                   ? relativeTime(article.published_at, t)

@@ -15,9 +15,7 @@ type Theme = "light" | "dark";
  * already on the element into React state so the icon and label stay accurate,
  * then flips it on click.
  *
- * With no stored preference the attribute is absent and the OS preference
- * decides (see the `prefers-color-scheme` block in globals.css) — so we read
- * the media query, not a hardcoded default, to pick the starting icon.
+ * The layout defaults to the light paper edition for new readers.
  */
 export function ThemeToggle() {
   const { t } = useI18n();
@@ -29,8 +27,7 @@ export function ThemeToggle() {
       setTheme(stamped);
       return;
     }
-    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-    setTheme(prefersDark ? "dark" : "light");
+    setTheme("light");
   }, []);
 
   function toggle() {

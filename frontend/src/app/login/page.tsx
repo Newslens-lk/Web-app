@@ -5,7 +5,6 @@ import { FormEvent, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 
 import { loginUser, registerUser } from "@/lib/api";
-import { ShineBorder } from "@/components/ShineBorder";
 import { useI18n } from "@/lib/i18n/client";
 
 type Mode = "login" | "register";
@@ -66,7 +65,7 @@ export default function LoginPage() {
         </p>
       </div>
 
-      {!isAdminLogin && <div className="mb-5 flex rounded-[3px] border border-rule bg-surface-2 p-1">
+      {!isAdminLogin && <div className="mb-5 flex rounded-none border border-rule bg-surface-2 p-1">
         {(["login", "register"] as Mode[]).map((option) => (
           <button
             key={option}
@@ -86,16 +85,8 @@ export default function LoginPage() {
 
       <form
         onSubmit={handleSubmit}
-        className="relative overflow-hidden rounded-[3px] border border-rule bg-surface p-5 shadow-2"
+        className="relative overflow-hidden rounded-none border border-rule bg-surface p-5 shadow-2"
       >
-        {/* Plum and gold — the interface's own colours. The bias palette is
-            never spent on decoration; those five make a claim about an outlet,
-            and using them here would dilute it. */}
-        <ShineBorder
-          borderWidth={2}
-          duration={10}
-          shineColor={["#5b2545", "#d9b65c", "#d9a3c4"]}
-        />
         {error && (
           <div className="mb-4 rounded-md border border-amber bg-amber-tint px-3 py-2 text-sm text-amber">
             {error}

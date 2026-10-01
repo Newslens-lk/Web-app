@@ -99,3 +99,41 @@ app/
 pip install -r requirements-dev.txt
 pytest --cov=app
 ```
+
+## Analytics
+
+`GET /api/analytics/overview` is public, like the news and event endpoints.
+Visitors and regular users can view the dashboard without a special role or login.
+Filters: repeated `source` parameters, `bias_label`, and `date_from`/`date_to`
+(ISO calendar dates, inclusive, Asia/Colombo). Reversed ranges return HTTP 422.
+
+The endpoint returns matching article counts, distinct event/publisher counts,
+overall bias counts/percentages, and the same distribution for each publisher.
+Unknown or missing labels remain in an `unclassified` bucket and in denominators.
+All-time results include undated articles. Date-filtered results exclude them and
+report the count excluded under the same source/bias filters. Collection timestamps
+are never used as publication timestamps. Responses are not cached.
+
+The `/analytics` dashboard provides these filters and Chart.js charts with data
+tables. It flags samples below 20 articles as a reading aid, not a significance test.
+No topic, sentiment, trend, or reporting-latency results are invented for missing data.
+
+## Article image repair
+
+Image backfilling rejects known publisher placeholders and validates actual image
+dimensions (at least 320 × 160). Lankadeepa article-body photos take priority over
+its unreliable Open Graph image. Ads and related-story images are not fallbacks.
+
+Run from the backend directory or inside the backend container:
+
+```bash
+python -m scripts.backfill_article_images --source lankadeepa --limit 100
+python -m scripts.backfill_article_images --source lankadeepa --replace-url "BAD_IMAGE_URL" --dry-run
+python -m scripts.backfill_article_images --source lankadeepa --replace-url "BAD_IMAGE_URL" --backup image-repair.json
+```
+
+The default processes only missing images; `--replace-url` targets existing records
+with exactly that URL. Repairs write a JSON backup of old and new values before
+committing. If an article page cannot be fetched, its stored value is preserved.
+If it loads but has no suitable photo, the image is cleared and the UI shows
+“No image available.” Copy backups out of a container before recreating it.

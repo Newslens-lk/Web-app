@@ -123,10 +123,10 @@ export function AnalyticsInsights({ data, part }: { data: Insights; part: "confi
       <h2 className="font-serif text-xl font-semibold">How sure is the model?</h2>
       <div className="mt-4 flex flex-wrap gap-4 text-xs">{legend.slice(0, 5)}</div>
       <div className="mt-4 h-72"><canvas ref={confidenceCanvas} role="img" aria-label="Distribution of model confidence for each predicted category. Exact values are in the following table." /></div>
-      <table className="mt-4 w-full text-sm">
+      <table className="[&_td]:px-2 [&_th]:px-2 mt-4 w-full text-sm">
         <caption className="sr-only">Model confidence by predicted category</caption>
-        <thead><tr className="border-b border-rule text-left"><th scope="col" className="py-2">Category</th><th scope="col">Articles scored</th><th scope="col">Average confidence</th><th scope="col">Below {Math.round(data.low_confidence_threshold * 100)}%</th></tr></thead>
-        <tbody>{data.confidence.map((c) => <tr key={c.label} className="border-b border-rule last:border-0">
+        <thead><tr className="text-left"><th scope="col" className="py-2">Category</th><th scope="col">Articles scored</th><th scope="col">Average confidence</th><th scope="col">Below {Math.round(data.low_confidence_threshold * 100)}%</th></tr></thead>
+        <tbody>{data.confidence.map((c) => <tr key={c.label} className="odd:bg-surface-2">
           <th scope="row" className="py-2 text-left font-normal">{labelText(c.label)}</th>
           <td>{c.scored}</td>
           <td>{c.mean === null ? "n/a" : `${(c.mean * 100).toFixed(1)}%`}</td>
@@ -149,10 +149,10 @@ export function AnalyticsInsights({ data, part }: { data: Insights; part: "confi
           <details className="mt-4 text-sm">
             <summary className="cursor-pointer text-ink-dim underline underline-offset-2">Show weekly values</summary>
             <div className="mt-3 overflow-x-auto">
-              <table className="w-full">
+              <table className="[&_td]:px-2 [&_th]:px-2 w-full">
                 <caption className="sr-only">Predicted categories by week</caption>
-                <thead><tr className="border-b border-rule text-left"><th scope="col" className="py-2 pr-4">Week of</th><th scope="col" className="pr-4">Articles</th>{data.confidence.map((c) => <th scope="col" key={c.label} className="px-3 whitespace-nowrap">{labelText(c.label)}</th>)}</tr></thead>
-                <tbody>{data.timeline.map((w) => <tr key={w.week_start} className="border-b border-rule last:border-0">
+                <thead><tr className="text-left"><th scope="col" className="py-2 pr-4">Week of</th><th scope="col" className="pr-4">Articles</th>{data.confidence.map((c) => <th scope="col" key={c.label} className="px-3 whitespace-nowrap">{labelText(c.label)}</th>)}</tr></thead>
+                <tbody>{data.timeline.map((w) => <tr key={w.week_start} className="odd:bg-surface-2">
                   <th scope="row" className="py-2 pr-4 text-left font-normal whitespace-nowrap">{weekText(w.week_start)}</th><td className="pr-4 font-mono">{w.total}</td>
                   {data.confidence.map((c) => <td key={c.label} className="px-3">{w.counts[c.label] ?? 0}</td>)}
                 </tr>)}</tbody>
@@ -172,20 +172,20 @@ export function AnalyticsInsights({ data, part }: { data: Insights; part: "confi
       </dl>
       <div className="mt-6 grid gap-8 md:grid-cols-[2fr_1fr]">
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+          <table className="[&_td]:px-2 [&_th]:px-2 w-full text-sm">
             <caption className="mb-2 text-left text-sm font-semibold text-ink">Coverage by publisher</caption>
-            <thead><tr className="border-b border-rule text-left"><th scope="col" className="py-2 pr-4">Publisher</th><th scope="col" className="pr-4">Articles</th><th scope="col" className="pr-4">Dated</th><th scope="col" className="whitespace-nowrap pr-4">First</th><th scope="col" className="whitespace-nowrap">Latest</th></tr></thead>
-            <tbody>{data.publishers.map((p) => <tr key={p.source_name} className="border-b border-rule last:border-0">
+            <thead><tr className="text-left"><th scope="col" className="py-2 pr-4">Publisher</th><th scope="col" className="pr-4">Articles</th><th scope="col" className="pr-4">Dated</th><th scope="col" className="whitespace-nowrap pr-4">First</th><th scope="col" className="whitespace-nowrap">Latest</th></tr></thead>
+            <tbody>{data.publishers.map((p) => <tr key={p.source_name} className="odd:bg-surface-2">
               <th scope="row" className="py-2 pr-4 text-left font-normal whitespace-nowrap">{sourceDisplayName(p.source_name)}</th>
               <td className="pr-4 font-mono">{p.article_count}</td><td className="pr-4 font-mono">{p.dated_articles}</td>
               <td className="whitespace-nowrap pr-4">{dayText(p.first_published)}</td><td className="whitespace-nowrap">{dayText(p.latest_published)}</td>
             </tr>)}</tbody>
           </table>
         </div>
-        <table className="h-fit w-full text-sm">
+        <table className="[&_td]:px-2 [&_th]:px-2 h-fit w-full text-sm">
           <caption className="mb-2 text-left text-sm font-semibold text-ink">Language</caption>
-          <thead><tr className="border-b border-rule text-left"><th scope="col" className="py-2">Language</th><th scope="col">Articles</th><th scope="col">Share</th></tr></thead>
-          <tbody>{data.languages.map((l) => <tr key={l.language} className="border-b border-rule last:border-0">
+          <thead><tr className="text-left"><th scope="col" className="py-2">Language</th><th scope="col">Articles</th><th scope="col">Share</th></tr></thead>
+          <tbody>{data.languages.map((l) => <tr key={l.language} className="odd:bg-surface-2">
             <th scope="row" className="py-2 text-left font-normal uppercase">{l.language}</th><td>{l.count}</td><td>{pct(l.count, data.total_articles)}</td>
           </tr>)}</tbody>
         </table>

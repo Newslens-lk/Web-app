@@ -36,18 +36,18 @@ export function AnalyticsTabs({ tabs }: { tabs: Tab[] }) {
 
   const current = tabs.find((tab) => tab.id === active) ?? tabs[0];
   return <div>
-    <div role="tablist" aria-label="Analytics views" className="-mx-1 flex gap-1 overflow-x-auto border-b border-rule px-1">
+    <div role="tablist" aria-label="Analytics views" className="-mx-1 flex gap-1 overflow-x-auto px-1">
       {tabs.map((tab, index) => {
         const selected = tab.id === current.id;
         return <button
           key={tab.id} id={`tab-${tab.id}`} role="tab" type="button" aria-selected={selected} aria-controls={`panel-${tab.id}`}
           tabIndex={selected ? 0 : -1} ref={(node) => { buttons.current[tab.id] = node; }}
           onClick={() => select(tab.id)} onKeyDown={(event) => onKeyDown(event, index)}
-          className={`-mb-px cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ink whitespace-nowrap border-b-2 px-3 py-2 text-sm ${selected ? "border-brand font-semibold text-ink" : "border-transparent text-ink-dim hover:text-ink"}`}
+          className={`cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ink whitespace-nowrap border-b-2 px-3 py-2 text-sm ${selected ? "border-brand font-semibold text-ink" : "border-transparent text-ink-dim hover:text-ink"}`}
         >{tab.label}</button>;
       })}
     </div>
-    <div role="tabpanel" id={`panel-${current.id}`} aria-labelledby={`tab-${current.id}`} tabIndex={0} className="mt-6">
+    <div role="tabpanel" id={`panel-${current.id}`} aria-labelledby={`tab-${current.id}`} tabIndex={0} className="mt-4">
       {current.content}
     </div>
   </div>;

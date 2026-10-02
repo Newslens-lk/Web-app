@@ -73,20 +73,3 @@ async function getFromApi<T>(path: string, query: URLSearchParams): Promise<ApiR
 
 export const getAnalytics = (query: URLSearchParams) => getFromApi<AnalyticsOverview>("overview", query);
 export const getInsights = (query: URLSearchParams) => getFromApi<AnalyticsInsights>("insights", query);
-
-export type AnalyticsStories = {
-  date_from: string | null;
-  date_to: string | null;
-  shared_events: number;
-  unanimous_events: number;
-  min_pair_events: number;
-  stories: {
-    event_id: string;
-    headline: string;
-    spread: number;
-    dots: { source_name: string; lean: number; articles: number }[];
-  }[];
-  pairs: { source_a: string; source_b: string; shared_events: number; differing_events: number; mean_gap: number }[];
-};
-
-export const getStories = (query: URLSearchParams) => getFromApi<AnalyticsStories>("stories", query);

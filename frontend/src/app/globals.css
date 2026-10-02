@@ -2,24 +2,24 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Muted paper and charcoal; bias colors retain their data meaning. */
+/* Black-and-white interface; bias colors retain their data meaning. */
 :root {
   color-scheme: light;
-  --bg: #ccc8be;
-  --surface: #d6d2c8;
-  --surface-2: #c2beb3;
-  --surface-3: #b6b2a7;
-  --ink: #2d2d29;
-  --ink-dim: #484840;
-  --ink-faint: #53534a;
-  --rule: #aaa69a;
-  --rule-strong: #817e72;
-  --brand: #252525;
-  --brand-ink: #151515;
-  --brand-tint: #c2beb3;
-  --button-ink: #d6d2c8;
-  --amber: #655423;
-  --amber-tint: #cec5aa;
+  --bg: #ffffff;
+  --surface: #ffffff;
+  --surface-2: #f5f5f5;
+  --surface-3: #ebebeb;
+  --ink: #252525;
+  --ink-dim: #333333;
+  --ink-faint: #595959;
+  --rule: #d4d4d4;
+  --rule-strong: #737373;
+  --brand: #292929;
+  --brand-ink: #000000;
+  --brand-tint: #f5f5f5;
+  --button-ink: #f2f2f2;
+  --amber: #000000;
+  --amber-tint: #f5f5f5;
   /* 5-class bias colors from spec. Reserved: nothing but bias data uses these. */
   --bias-far-left: #DC2626;
   --bias-left: #EA580C;
@@ -34,67 +34,10 @@
   --shadow-1: none;
   --shadow-2: none;
   --shadow-3: 0 12px 30px rgb(0 0 0 / 8%);
-  --font-serif: var(--font-display), var(--font-sinhala), Georgia, serif;
-  --font-sans: var(--font-ui), var(--font-sinhala), Arial, sans-serif;
+  /* Installed fonts keep production builds independent of external font servers. */
+  --font-serif: Georgia, "Times New Roman", "Noto Serif Sinhala", "Iskoola Pota", serif;
+  --font-sans: Arial, "Noto Sans Sinhala", "Iskoola Pota", sans-serif;
   --font-mono: ui-monospace, "Cascadia Code", Consolas, monospace;
-}
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    color-scheme: dark;
-    --bg: #171717;
-    --surface: #1e1e1d;
-    --surface-2: #292928;
-    --surface-3: #383836;
-    --ink: #f0f0eb;
-    --ink-dim: #c0c0b8;
-    --ink-faint: #999991;
-    --rule: #3d3d38;
-    --rule-strong: #6d6d64;
-    --brand: #eeeeea;
-    --brand-ink: #ffffff;
-    --brand-tint: #33332f;
-    --button-ink: #171717;
-    --amber: #d9c58b;
-    --amber-tint: #332e22;
-    --bias-far-left: #ea5c60;
-    --bias-left: #ee6b1f;
-    --bias-center: #8a9299;
-    --bias-right: #3b82f6;
-    --bias-far-right: #4f63c4;
-    --bias-far-left-on: #1a1418;
-    --bias-left-on: #1a1418;
-    --bias-center-on: #1a1418;
-    --bias-right-on: #1a1418;
-    --bias-far-right-on: #ffffff;
-  }
-}
-:root[data-theme="dark"] {
-  color-scheme: dark;
-  --bg: #171717;
-  --surface: #1e1e1d;
-  --surface-2: #292928;
-  --surface-3: #383836;
-  --ink: #f0f0eb;
-  --ink-dim: #c0c0b8;
-  --ink-faint: #999991;
-  --rule: #3d3d38;
-  --rule-strong: #6d6d64;
-  --brand: #eeeeea;
-  --brand-ink: #ffffff;
-  --brand-tint: #33332f;
-  --button-ink: #171717;
-  --amber: #d9c58b;
-  --amber-tint: #332e22;
-  --bias-far-left: #ea5c60;
-  --bias-left: #ee6b1f;
-  --bias-center: #8a9299;
-  --bias-right: #3b82f6;
-  --bias-far-right: #4f63c4;
-  --bias-far-left-on: #1a1418;
-  --bias-left-on: #1a1418;
-  --bias-center-on: #1a1418;
-  --bias-right-on: #1a1418;
-  --bias-far-right-on: #ffffff;
 }
 html, body {
   background: var(--bg);
@@ -111,7 +54,7 @@ html, body {
   input, select, textarea { accent-color: var(--brand); }
 }
 @layer components {
-  .edition-strip { background: #202020; color: #f7f7f5; text-align: center; padding: 9px 20px; font-size: 13px; letter-spacing: 0.025em; }
+  .edition-strip { background: var(--surface-2); color: var(--ink-dim); text-align: center; padding: 9px 20px; font-size: 13px; letter-spacing: 0.025em; }
   .masthead-grid { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 24px; min-height: 108px; }
   .masthead-logo { grid-column: 2; grid-row: 1; font-family: var(--font-serif); font-size: 44px; font-weight: 700; letter-spacing: -0.045em; line-height: 1; }
   .masthead-nav { grid-column: 1; grid-row: 1; }
@@ -123,13 +66,50 @@ html, body {
   .editorial-button { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 12px 24px; background: var(--brand); color: var(--button-ink); font-size: 13px; font-weight: 600; }
   .editorial-button:hover { opacity: 0.8; }
   .editorial-link { text-decoration: underline; text-underline-offset: 5px; }
-  .edition-heading { border-bottom: 1px solid var(--ink); margin-bottom: 32px; padding-bottom: 24px; font-size: clamp(2.5rem, 5vw, 4.5rem); font-weight: 600; line-height: 1.1; }
+  .edition-heading { border: 0; margin-bottom: 24px; padding-block: 12px; font-size: clamp(2.5rem, 5vw, 4.5rem); font-weight: 600; line-height: 1.1; }
 }
 .bg-brand.text-white { color: var(--button-ink); }
-main :is(.rounded-md, .rounded-lg, .rounded-xl, .rounded-2xl) { border-radius: 0; }
+/* High-contrast cards keep their text and nested controls on the same palette. */
+.contrast-card {
+  --surface: #000000;
+  --surface-2: #242424;
+  --surface-3: #383838;
+  --ink: #ffffff;
+  --ink-dim: #e0e0e0;
+  --ink-faint: #bdbdbd;
+  --brand: #ffffff;
+  --brand-ink: #ffffff;
+  --brand-tint: #242424;
+  --button-ink: #000000;
+  --amber: #ffffff;
+  --rule: #383838;
+  --rule-strong: #808080;
+  background: var(--surface);
+  color: var(--ink);
+  color-scheme: dark;
+}
+.contrast-card :is(.bg-surface-2, .bg-surface-3) {
+  --surface: #ffffff;
+  --surface-2: #eeeeee;
+  --surface-3: #dddddd;
+  --ink: #000000;
+  --ink-dim: #333333;
+  --ink-faint: #595959;
+  --brand: #000000;
+  --brand-ink: #000000;
+  --brand-tint: #eeeeee;
+  --button-ink: #ffffff;
+  --amber: #000000;
+  --rule: #dddddd;
+  --rule-strong: #737373;
+  background: #ffffff;
+  color: #000000;
+  color-scheme: light;
+}
+main :is(.rounded-md, .rounded-lg, .rounded-xl, .rounded-2xl) { border-radius: 10px; }
 main :is(.shadow-1, .shadow-2) { box-shadow: none; }
-main > :is(div, section) > header { border-bottom: 1px solid var(--ink); padding-bottom: 28px; margin-bottom: 32px; }
-main h1 { font-size: clamp(2.25rem, 4vw, 4rem); line-height: 1.12; }
+main > :is(div, section) > header { border: 0; padding-block: 12px; margin-bottom: 24px; }
+main h1 { font-size: clamp(1.5rem, 2.5vw, 2rem); line-height: 1.25; }
 main h1.cover-title { font-size: clamp(4rem, 8vw, 8rem); line-height: 1; }
 main h1.landing-headline { font-size: clamp(2.6rem, 7vw, 4.5rem); line-height: 1.02; }
 .landing-wash { background: linear-gradient(90deg, var(--bg) 0%, var(--bg) 30%, color-mix(in srgb, var(--bg) 94%, transparent) 45%, color-mix(in srgb, var(--bg) 12%, transparent) 78%); }

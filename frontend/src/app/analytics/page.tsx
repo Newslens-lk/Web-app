@@ -53,7 +53,7 @@ export default async function AnalyticsPage({ searchParams }: Props) {
       </dl>}
     </header>
 
-    <form key={query.toString()} action="/analytics" method="get" className="py-1 text-sm">
+    <form key={query.toString()} action="/analytics" method="get" className="py-2 text-sm">
       <div className="flex flex-wrap items-center gap-x-5 gap-y-3">
         <span className="flex items-center gap-1.5 text-ink-dim">
           <input className={bareClass} name="date_from" type="date" aria-label="Published from" defaultValue={query.get("date_from") ?? ""} />

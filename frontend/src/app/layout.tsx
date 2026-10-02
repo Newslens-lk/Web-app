@@ -2,7 +2,6 @@ import type { Metadata, Viewport } from "next";
 import { IBM_Plex_Sans, Newsreader, Noto_Serif_Sinhala } from "next/font/google";
 import "./globals.css";
 import { Masthead } from "@/components/Masthead";
-import { Footer } from "@/components/Footer";
 import { LocaleProvider } from "@/lib/i18n/client";
 import { getDictionary, getLocale } from "@/lib/i18n/server";
 
@@ -80,7 +79,6 @@ export default function RootLayout({
           <main className="mx-auto max-w-shell px-4 sm:px-6 py-8 pb-20">
             {children}
           </main>
-          <Footer />
         </LocaleProvider>
       </body>
     </html>

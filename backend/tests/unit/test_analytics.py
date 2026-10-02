@@ -126,20 +126,15 @@ def test_invalid_filters_return_validation_error(client, analytics_db, query):
     assert client.get(f"/api/analytics/overview?{query}").status_code == 422
 
 
-def test_insights_confidence_by_label(client, analytics_db):
+def test_insights_category_totals(client, analytics_db):
     response = client.get("/api/analytics/insights")
     assert response.status_code == 200
     assert response.headers["cache-control"] == "no-store"
     body = response.json()
     assert body["total_articles"] == 5
-    assert body["missing_confidence"] == 1
-    by_label = {row["label"]: row for row in body["confidence"]}
-    assert by_label["left"]["histogram"][9] == 1 and by_label["left"]["mean"] == 0.95
-    assert by_label["right"]["histogram"][9] == 1  # confidence 1.0 lands in the top bin
-    assert by_label["center"]["low_count"] == 1
-    assert by_label["unclassified"]["scored"] == 1
-    assert by_label["unclassified"]["total"] == 2  # one unknown label, one null label
-    assert all(len(row["histogram"]) == 10 for row in body["confidence"])
+    assert {c["label"]: c["count"] for c in body["categories"]} == {
+        "far_left": 0, "left": 1, "center": 1, "right": 1, "far_right": 0, "unclassified": 2,
+    }
 
 
 def test_insights_timeline_fills_empty_weeks_and_skips_undated(client, analytics_db):

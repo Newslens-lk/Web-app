@@ -18,15 +18,6 @@ class PublisherAnalytics(BaseModel):
     bias_distribution: list[BiasCount]
 
 
-class LabelConfidence(BaseModel):
-    label: str
-    total: int
-    scored: int
-    mean: float | None
-    low_count: int
-    histogram: list[int]  # ten equal-width bins over confidence 0.0 to 1.0
-
-
 class TimelineWeek(BaseModel):
     week_start: date
     total: int
@@ -51,9 +42,7 @@ class AnalyticsInsights(BaseModel):
     date_to: date | None
     timezone: str = "Asia/Colombo"
     total_articles: int
-    missing_confidence: int
-    low_confidence_threshold: float
-    confidence: list[LabelConfidence]
+    categories: list[BiasCount]
     timeline: list[TimelineWeek]
     languages: list[LanguageCount]
     publishers: list[PublisherFreshness]

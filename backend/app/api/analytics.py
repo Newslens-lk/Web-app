@@ -10,7 +10,7 @@ from sqlalchemy.orm import Session
 from app.db.session import get_db
 from app.models.article import Article
 from app.schemas.analytics import (
-    AnalyticsInsights, AnalyticsOverview, AnalyticsStories, DividedStory, PublisherPair, StoryDot, BiasCategory, BiasCount, LabelConfidence,
+    AnalyticsInsights, AnalyticsOverview, AnalyticsStories, DividedStory, PublisherPair, StoryDot, BiasCategory, BiasCount,
     LanguageCount, PublisherAnalytics, PublisherFreshness, TimelineWeek,
 )
 from app.schemas.event import BIAS_LABELS
@@ -109,10 +109,6 @@ def overview(
     )
 
 
-LOW_CONFIDENCE = 0.6
-BINS = 10
-
-
 @router.get("/insights", response_model=AnalyticsInsights)
 def insights(
     response: Response,
@@ -122,7 +118,7 @@ def insights(
     bias_label: BiasCategory | None = None,
     db: Session = Depends(get_db),
 ) -> AnalyticsInsights:
-    """Model confidence, weekly timeline and data-quality facts for the same filters."""
+    """Weekly timeline and data-quality facts for the same filters."""
     response.headers["Cache-Control"] = "no-store"
     if date_from and date_to and date_from > date_to:
         raise HTTPException(status_code=422, detail="Start date must not be after end date")
@@ -133,31 +129,20 @@ def insights(
         conditions.append(Article.published_at <= datetime.combine(date_to, time.max, COLOMBO))
     rows = db.execute(
         select(
-            Article.source_name, label, Article.published_at,
-            Article.bias_confidence, Article.language,
+            Article.source_name, label, Article.published_at, Article.language,
         ).where(*conditions)
     ).all()
 
-    histograms = {name: [0] * BINS for name in CATEGORIES}
-    sums = dict.fromkeys(CATEGORIES, 0.0)
-    low = dict.fromkeys(CATEGORIES, 0)
     totals = dict.fromkeys(CATEGORIES, 0)
-    missing_confidence = 0
     weeks: dict[date, dict[str, int]] = {}
     languages: dict[str, int] = {}
     publishers: dict[str, list] = {}  # name -> [articles, dated, first, latest]
-    for name, category, published_at, confidence, language in rows:
+    for name, category, published_at, language in rows:
         lang = (language or "").strip().lower() or "unknown"
         languages[lang] = languages.get(lang, 0) + 1
         totals[category] += 1
         stats = publishers.setdefault(name, [0, 0, None, None])
         stats[0] += 1
-        if confidence is None:
-            missing_confidence += 1
-        else:
-            histograms[category][min(max(int(confidence * BINS), 0), BINS - 1)] += 1
-            sums[category] += confidence
-            low[category] += confidence < LOW_CONFIDENCE
         if published_at is not None:
             day = colombo(published_at).date()
             week = day - timedelta(days=day.weekday())
@@ -174,17 +159,9 @@ def insights(
             timeline.append(TimelineWeek(week_start=week, total=sum(counts.values()), counts=counts))
             week += timedelta(days=7)
 
-    confidence_rows = []
-    for name in CATEGORIES:
-        scored = sum(histograms[name])
-        confidence_rows.append(LabelConfidence(
-            label=name, total=totals[name], scored=scored, histogram=histograms[name], low_count=low[name],
-            mean=round(sums[name] / scored, 4) if scored else None,
-        ))
     return AnalyticsInsights(
         date_from=date_from, date_to=date_to, total_articles=len(rows),
-        missing_confidence=missing_confidence, low_confidence_threshold=LOW_CONFIDENCE,
-        confidence=confidence_rows, timeline=timeline,
+        categories=distribution(totals), timeline=timeline,
         languages=[LanguageCount(language=k, count=v) for k, v in sorted(
             languages.items(), key=lambda item: (-item[1], item[0]))],
         publishers=[

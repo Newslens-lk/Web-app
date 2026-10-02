@@ -84,10 +84,9 @@ export default async function AnalyticsPage({ searchParams }: Props) {
       : <>
         {(() => {
           const unavailable = <p role="alert" className="border-l-2 border-amber pl-4 text-sm">This view is unavailable right now.</p>;
-          const detail = (part: "confidence" | "timeline" | "quality") => insights.data ? <AnalyticsInsights data={insights.data} part={part} /> : unavailable;
+          const detail = (part: "timeline" | "quality") => insights.data ? <AnalyticsInsights data={insights.data} part={part} /> : unavailable;
           return <AnalyticsTabs tabs={[
             { id: "mix", label: "Bias mix", content: <AnalyticsCharts data={data} /> },
-            { id: "confidence", label: "Confidence", content: detail("confidence") },
             { id: "timeline", label: "Timeline", content: detail("timeline") },
             { id: "quality", label: "Data quality", content: detail("quality") },
           ]} />;

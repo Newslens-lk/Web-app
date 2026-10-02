@@ -30,16 +30,7 @@ export type AnalyticsInsights = {
   date_to: string | null;
   timezone: string;
   total_articles: number;
-  missing_confidence: number;
-  low_confidence_threshold: number;
-  confidence: {
-    label: AnalyticsBucket["label"];
-    total: number;
-    scored: number;
-    mean: number | null;
-    low_count: number;
-    histogram: number[];
-  }[];
+  categories: AnalyticsBucket[];
   timeline: { week_start: string; total: number; counts: Record<string, number> }[];
   languages: { language: string; count: number }[];
   publishers: {

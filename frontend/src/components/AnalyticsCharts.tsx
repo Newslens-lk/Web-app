@@ -74,8 +74,7 @@ export function AnalyticsCharts({ data }: { data: AnalyticsOverview }) {
 
   return <div className="space-y-12">
     <section>
-      <h2 className="font-serif text-xl font-semibold">Overall</h2>
-      <p className="mt-1 text-sm text-ink-dim">Every matching article, sorted by its predicted lean.</p>
+      <h2 className="font-serif text-xl font-semibold">What are the selected articles predicted as?</h2>
       <div className="mt-4 h-72"><canvas ref={overallCanvas} role="img" aria-label="Article counts by predicted bias. Exact values are in the following table." /></div>
       <table className="mt-4 w-full text-sm">
         <caption className="sr-only">Overall predicted bias distribution</caption>
@@ -84,8 +83,7 @@ export function AnalyticsCharts({ data }: { data: AnalyticsOverview }) {
       </table>
     </section>
     <section>
-      <h2 className="font-serif text-xl font-semibold">By publisher</h2>
-      <p className="mt-1 text-sm text-ink-dim">Each bar is one publisher&rsquo;s articles, split by lean.</p>
+      <h2 className="font-serif text-xl font-semibold">How do publishers&rsquo; article mixes differ?</h2>
       <div className="mt-4 flex flex-wrap gap-4 text-xs">{data.bias_distribution.map((b) => <span key={b.label} className="inline-flex items-center gap-2"><span className="h-3 w-3 rounded-sm" style={{ backgroundColor: b.label === "unclassified" ? "var(--ink-faint)" : `var(--bias-${b.label.replaceAll("_", "-")})` }} />{labelText(b.label)}</span>)}</div>
       <div className="mt-4" style={{ height: Math.max(220, data.publishers.length * 65) }}><canvas ref={publisherCanvas} role="img" aria-label="Predicted bias shares by publisher. Exact counts and percentages follow." /></div>
       <div className="mt-4 overflow-x-auto">

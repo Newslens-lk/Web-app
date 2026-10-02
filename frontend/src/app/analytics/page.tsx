@@ -1,9 +1,12 @@
 import Link from "next/link";
 import { getSources } from "@/lib/api";
-import { getAnalytics } from "@/lib/analytics";
+import { getAnalytics, getInsights, getStories } from "@/lib/analytics";
 import { BIAS_LABELS, sourceDisplayName } from "@/lib/constants";
 import { getDictionary } from "@/lib/i18n/server";
 import { AnalyticsCharts } from "@/components/AnalyticsCharts";
+import { AnalyticsInsights } from "@/components/AnalyticsInsights";
+import { AnalyticsSpectrum } from "@/components/AnalyticsSpectrum";
+import { AnalyticsTabs } from "@/components/AnalyticsTabs";
 
 type Props = { searchParams: Record<string, string | string[] | undefined> };
 
@@ -20,7 +23,7 @@ export default async function AnalyticsPage({ searchParams }: Props) {
       if (item) query.append(key, item);
     }
   }
-  const result = await getAnalytics(query);
+  const [result, insights, stories] = await Promise.all([getAnalytics(query), getInsights(query), getStories(query)]);
   let sourceOptions: string[] = [];
   try { sourceOptions = (await getSources()).sources.map((s) => s.source_name); } catch { /* Filters remain usable on API failure. */ }
   sourceOptions = Array.from(new Set([...sourceOptions, ...query.getAll("source")]));
@@ -73,16 +76,32 @@ export default async function AnalyticsPage({ searchParams }: Props) {
         </label>)}
       </fieldset>}
     </form>
-
     {result.error && <p role="alert" className="border-l-2 border-amber pl-4 text-sm">{result.error}</p>}
     {data && (data.total_articles === 0
       ? <p className="py-12 text-center text-ink-dim">Nothing matches these filters. Try a wider date range, or <Link href="/analytics" className="underline underline-offset-2">reset them</Link>.</p>
-      : <AnalyticsCharts data={data} />)}
+      : <>
+        {(() => {
+          const leading = [...data.bias_distribution].sort((a, b) => b.count - a.count)[0];
+          const publisher = data.publishers[0];
+          return <section className="border-l-2 border-brand bg-brand/5 p-4" aria-label="Quick read">
+            <p className="text-xs font-semibold uppercase tracking-widest text-brand">Quick read</p>
+            <p className="mt-2 text-sm leading-6 text-ink"><span className="font-semibold">{leading.label === "unclassified" ? "Unclassified" : t.bias[leading.label]}</span> is the largest predicted category ({leading.count.toLocaleString("en-US")} articles, {leading.percentage.toFixed(1)}%). {publisher && <><span className="font-semibold">{sourceDisplayName(publisher.source_name)}</span> has the largest matching sample ({publisher.article_count.toLocaleString("en-US")} articles).</>}</p>
+          </section>;
+        })()}
+        {(() => {
+          const unavailable = <p role="alert" className="border-l-2 border-amber pl-4 text-sm">This view is unavailable right now.</p>;
+          const detail = (part: "confidence" | "timeline" | "quality") => insights.data ? <AnalyticsInsights data={insights.data} part={part} /> : unavailable;
+          return <AnalyticsTabs tabs={[
+            { id: "spectrum", label: "Spectrum", content: <AnalyticsSpectrum overview={data} stories={stories.data} part="spectrum" /> },
+            { id: "stories", label: "Shared stories", content: <AnalyticsSpectrum overview={data} stories={stories.data} part="shared" /> },
+            { id: "mix", label: "Bias mix", content: <AnalyticsCharts data={data} /> },
+            { id: "confidence", label: "Confidence", content: detail("confidence") },
+            { id: "timeline", label: "Timeline", content: detail("timeline") },
+            { id: "quality", label: "Data quality", content: detail("quality") },
+          ]} />;
+        })()}
+      </>)}
 
-    <p className="border-t border-rule pt-4 text-xs leading-relaxed text-ink-dim">
-      Bias labels come from a model, so treat them as estimates rather than verdicts on a publisher, and they say nothing about factual accuracy.
-      Publishers cover different stories, so their shares aren&rsquo;t a like-for-like comparison. An event covered by several publishers is counted once.
-      Dates are in Sri Lanka time and include both ends of the range.
-    </p>
+    <p className="border-t border-rule pt-4 text-xs text-ink-dim">Bias labels are model estimates, not verdicts on a publisher or on accuracy.</p>
   </div>;
 }

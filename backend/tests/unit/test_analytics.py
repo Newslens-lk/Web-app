@@ -4,7 +4,8 @@ from datetime import datetime
 from types import SimpleNamespace
 
 import pytest
-from sqlalchemy import Column, DateTime, MetaData, String, Table, create_engine, event
+from sqlalchemy import Column, DateTime, Float, MetaData, String, Table, create_engine, event
+from sqlalchemy import text
 from sqlalchemy.orm import Session
 from sqlalchemy.pool import StaticPool
 
@@ -20,18 +21,20 @@ def analytics_db(override_get_db):
         "articles", metadata,
         Column("article_id", String, primary_key=True), Column("source_name", String),
         Column("bias_label", String), Column("published_at", DateTime), Column("event_id", String),
+        Column("bias_confidence", Float), Column("language", String), Column("title", String),
     )
     metadata.create_all(engine)
     with Session(engine) as db:
         rows = [
-            ("1", "alpha", "left", datetime(2026, 9, 1, 0, 0), "event1"),
-            ("2", "alpha", " CENTER ", datetime(2026, 9, 1, 23, 59, 59, 999999), "event1"),
-            ("3", "beta", "right", datetime(2026, 9, 2), "event1"),
-            ("4", "beta", None, None, "event2"),
-            ("5", "alpha", "unknown", None, None),
+            ("1", "alpha", "left", datetime(2026, 9, 1, 0, 0), "00000000-0000-0000-0000-000000000001", 0.95, "en", "Budget passes"),
+            ("2", "alpha", " CENTER ", datetime(2026, 9, 1, 23, 59, 59, 999999), "00000000-0000-0000-0000-000000000001", 0.5, "EN ", "Budget later"),
+            ("3", "beta", "right", datetime(2026, 9, 2), "00000000-0000-0000-0000-000000000001", 1.0, "si", "Budget slammed"),
+            ("4", "beta", None, None, "00000000-0000-0000-0000-000000000002", None, None, "Rain"),
+            ("5", "alpha", "unknown", None, None, 0.2, "en", "Misc"),
         ]
         db.execute(articles.insert(), [dict(zip(
-            ("article_id", "source_name", "bias_label", "published_at", "event_id"), row,
+            ("article_id", "source_name", "bias_label", "published_at", "event_id",
+             "bias_confidence", "language", "title"), row,
         )) for row in rows])
         db.commit()
         override_get_db(db)
@@ -121,3 +124,70 @@ def test_empty_result_has_zero_buckets(client, analytics_db):
 ])
 def test_invalid_filters_return_validation_error(client, analytics_db, query):
     assert client.get(f"/api/analytics/overview?{query}").status_code == 422
+
+
+def test_insights_confidence_by_label(client, analytics_db):
+    response = client.get("/api/analytics/insights")
+    assert response.status_code == 200
+    assert response.headers["cache-control"] == "no-store"
+    body = response.json()
+    assert body["total_articles"] == 5
+    assert body["missing_confidence"] == 1
+    by_label = {row["label"]: row for row in body["confidence"]}
+    assert by_label["left"]["histogram"][9] == 1 and by_label["left"]["mean"] == 0.95
+    assert by_label["right"]["histogram"][9] == 1  # confidence 1.0 lands in the top bin
+    assert by_label["center"]["low_count"] == 1
+    assert by_label["unclassified"]["scored"] == 1
+    assert by_label["unclassified"]["total"] == 2  # one unknown label, one null label
+    assert all(len(row["histogram"]) == 10 for row in body["confidence"])
+
+
+def test_insights_timeline_fills_empty_weeks_and_skips_undated(client, analytics_db):
+    analytics_db.execute(text(
+        "INSERT INTO articles VALUES ('7','alpha','left','2026-09-21 00:00:00','00000000-0000-0000-0000-000000000003',0.7,'en','T7')"
+    ))
+    analytics_db.commit()
+    timeline = client.get("/api/analytics/insights").json()["timeline"]
+    assert [w["week_start"] for w in timeline] == ["2026-08-31", "2026-09-07", "2026-09-14", "2026-09-21"]
+    assert [w["total"] for w in timeline] == [3, 0, 0, 1]
+    assert timeline[0]["counts"]["left"] == 1
+
+
+def test_insights_languages_and_freshness(client, analytics_db):
+    body = client.get("/api/analytics/insights").json()
+    assert {row["language"]: row["count"] for row in body["languages"]} == {"en": 3, "si": 1, "unknown": 1}
+    alpha, beta = body["publishers"]
+    assert (alpha["source_name"], alpha["dated_articles"], alpha["latest_published"]) == ("alpha", 2, "2026-09-01")
+    assert (beta["article_count"], beta["dated_articles"]) == (2, 1)
+
+
+def test_insights_respects_filters_and_validation(client, analytics_db):
+    assert client.get("/api/analytics/insights?source=beta").json()["total_articles"] == 2
+    assert client.get("/api/analytics/insights?date_from=2026-09-02&date_to=2026-09-01").status_code == 422
+
+
+def test_stories_rank_shared_events_by_spread(client, analytics_db):
+    body = client.get("/api/analytics/stories").json()
+    assert (body["shared_events"], body["unanimous_events"]) == (1, 0)
+    story = body["stories"][0]
+    assert story["headline"] == "Budget passes"  # earliest article names the story
+    assert story["spread"] == 1.5  # alpha averages -0.5 (left, center), beta is +1
+    assert [(d["source_name"], d["lean"], d["articles"]) for d in story["dots"]] == [
+        ("alpha", -0.5, 2), ("beta", 1.0, 1),
+    ]
+    assert body["pairs"] == [{"source_a": "alpha", "source_b": "beta", "shared_events": 1, "differing_events": 1, "mean_gap": 1.5}]
+
+
+def test_stories_ignore_unclassified_and_single_publisher_events(client, analytics_db):
+    analytics_db.execute(text(
+        "INSERT INTO articles VALUES ('8','gamma','unknown','2026-09-03 00:00:00','00000000-0000-0000-0000-000000000001',0.9,'en','Noise')"
+    ))
+    analytics_db.commit()
+    body = client.get("/api/analytics/stories").json()
+    assert [d["source_name"] for d in body["stories"][0]["dots"]] == ["alpha", "beta"]
+    assert client.get("/api/analytics/stories?source=alpha").json()["shared_events"] == 0
+
+
+def test_stories_validation(client, analytics_db):
+    assert client.get("/api/analytics/stories?limit=0").status_code == 422
+    assert client.get("/api/analytics/stories?date_from=2026-09-02&date_to=2026-09-01").status_code == 422

@@ -29,7 +29,7 @@ export function DigitalClock() {
     return (
       <div
         aria-hidden
-        className="bg-surface border border-rule rounded-[3px] p-5 min-h-[168px]"
+        className="contrast-card bg-surface border border-rule rounded-[3px] p-5 min-h-[168px]"
       />
     );
   }
@@ -56,7 +56,7 @@ export function DigitalClock() {
   const weekday = now.toLocaleDateString(dateLocale, { weekday: "long" });
 
   return (
-    <div className="rounded-[3px] border border-rule bg-surface p-5 shadow-1">
+    <div className="rounded-[3px] border border-rule contrast-card bg-surface p-5 shadow-1">
       <div className="flex justify-between items-start gap-3 mb-4">
         <div>
           <div className="text-xs font-bold uppercase tracking-wider text-ink-faint">

@@ -36,14 +36,14 @@ export function AnalyticsTabs({ tabs }: { tabs: Tab[] }) {
 
   const current = tabs.find((tab) => tab.id === active) ?? tabs[0];
   return <div>
-    <div role="tablist" aria-label="Analytics views" className="-mx-1 flex gap-1 overflow-x-auto px-1">
+    <div role="tablist" aria-label="Analytics views" className="flex gap-5 overflow-x-auto py-2">
       {tabs.map((tab, index) => {
         const selected = tab.id === current.id;
         return <button
           key={tab.id} id={`tab-${tab.id}`} role="tab" type="button" aria-selected={selected} aria-controls={`panel-${tab.id}`}
           tabIndex={selected ? 0 : -1} ref={(node) => { buttons.current[tab.id] = node; }}
           onClick={() => select(tab.id)} onKeyDown={(event) => onKeyDown(event, index)}
-          className={`cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ink whitespace-nowrap border-b-2 px-3 py-2 text-sm ${selected ? "border-brand font-semibold text-ink" : "border-transparent text-ink-dim hover:text-ink"}`}
+          className={`cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ink whitespace-nowrap py-2 text-sm ${selected ? "font-semibold text-ink underline underline-offset-8" : "text-ink-dim hover:text-ink"}`}
         >{tab.label}</button>;
       })}
     </div>

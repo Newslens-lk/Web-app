@@ -38,7 +38,8 @@ export function AnalyticsInsights({ data, part }: { data: Insights; part: "timel
           label === "unclassified" ? "--ink-faint" : `--bias-${label.replaceAll("_", "-")}`,
         ).trim();
         const weeks = data.timeline.map((w) => weekText(w.week_start));
-        const labels = data.categories.map((c) => c.label);
+        const labels = data.categories.filter((c) => c.label !== "unclassified").map((c) => c.label);
+        const classifiedTotal = (w: Insights["timeline"][number]) => labels.reduce((sum, label) => sum + (w.counts[label] ?? 0), 0);
         const axis = { ticks: { color: ink, maxRotation: 0, autoSkip: true }, grid: { display: false } };
 
         charts = [
@@ -58,7 +59,7 @@ export function AnalyticsInsights({ data, part }: { data: Insights; part: "timel
               datasets: labels.map((label) => ({
                 label: labelText(label), borderColor: color(label), backgroundColor: color(label),
                 fill: true, borderWidth: 0.5, pointRadius: 0, tension: 0, spanGaps: false,
-                data: data.timeline.map((w) => w.total ? w.counts[label] * 100 / w.total : null),
+                data: data.timeline.map((w) => classifiedTotal(w) ? (w.counts[label] ?? 0) * 100 / classifiedTotal(w) : null),
               })),
             },
             options: {
@@ -67,8 +68,9 @@ export function AnalyticsInsights({ data, part }: { data: Insights; part: "timel
                 title: (items) => `Week of ${weeks[items[0].dataIndex]}`,
                 label: (context) => {
                   const w = data.timeline[context.dataIndex];
-                  const n = w.counts[labels[context.datasetIndex]];
-                  return `${labelText(labels[context.datasetIndex])}: ${n} of ${w.total} (${(n * 100 / w.total).toFixed(1)}%)`;
+                  const n = w.counts[labels[context.datasetIndex]] ?? 0;
+                  const total = classifiedTotal(w);
+                  return `${labelText(labels[context.datasetIndex])}: ${n} of ${total} (${(total ? n * 100 / total : 0).toFixed(1)}%)`;
                 },
               } } },
               scales: { x: axis, y: { stacked: true, min: 0, max: 100, ticks: { color: ink, callback: (v) => `${v}%` }, grid: { color: grid } } },
@@ -84,21 +86,23 @@ export function AnalyticsInsights({ data, part }: { data: Insights; part: "timel
     return () => { disposed = true; observer?.disconnect(); media.removeEventListener("change", draw); charts.forEach((chart) => chart.destroy()); };
   }, [data, labelText, part]);
 
-  const legend = data.categories.map((c) => <span key={c.label} className="inline-flex items-center gap-2">
+  const legend = data.categories.filter((c) => c.label !== "unclassified").map((c) => <span key={c.label} className="inline-flex items-center gap-2">
     <span className="h-3 w-3 rounded-sm" style={{ backgroundColor: c.label === "unclassified" ? "var(--ink-faint)" : `var(--bias-${c.label.replaceAll("_", "-")})` }} />{labelText(c.label)}
   </span>);
   const unclassified = data.categories.find((c) => c.label === "unclassified")?.count ?? 0;
   const datedTotal = data.publishers.reduce((sum, p) => sum + p.dated_articles, 0);
 
-  return <div className="space-y-12">
+  return <div className="space-y-10">
     {part === "timeline" && <section>
       <h2 className="font-serif text-xl font-semibold">What did we collect, week by week?</h2>
       {data.timeline.length === 0
         ? <p className="mt-2 text-sm text-ink-dim">No dated articles match these filters.</p>
         : <>
           <p className="mt-4 text-sm font-semibold text-ink">Articles per week</p>
+          <div aria-label="Weekly volume legend" className="mt-2 flex items-center gap-2 text-xs"><span aria-hidden="true" className="h-3 w-3 bg-ink-faint" />All articles with a publication date</div>
           <div className="mt-2 h-40"><canvas ref={volumeCanvas} role="img" aria-label="Articles published per week. Exact values are in the details table." /></div>
           <p className="mt-6 text-sm font-semibold text-ink">Category mix per week</p>
+          <p className="mt-1 text-xs text-ink-dim">Shares include only articles with a recognized bias label. Weekly article totals include all dated articles.</p>
           <div className="mt-2 flex flex-wrap gap-4 text-xs">{legend}</div>
           <div className="mt-3 h-64"><canvas ref={shareCanvas} role="img" aria-label="Predicted category shares per week. Exact values are in the details table." /></div>
           <details className="mt-4 text-sm">
@@ -106,10 +110,10 @@ export function AnalyticsInsights({ data, part }: { data: Insights; part: "timel
             <div className="mt-3 overflow-x-auto">
               <table className="[&_td]:px-2 [&_th]:px-2 w-full">
                 <caption className="sr-only">Predicted categories by week</caption>
-                <thead><tr className="text-left"><th scope="col" className="py-2 pr-4">Week of</th><th scope="col" className="pr-4">Articles</th>{data.categories.map((c) => <th scope="col" key={c.label} className="px-3 whitespace-nowrap">{labelText(c.label)}</th>)}</tr></thead>
+                <thead><tr className="text-left"><th scope="col" className="py-2 pr-4">Week of</th><th scope="col" className="pr-4">Articles</th>{data.categories.filter((c) => c.label !== "unclassified").map((c) => <th scope="col" key={c.label} className="px-3 whitespace-nowrap">{labelText(c.label)}</th>)}</tr></thead>
                 <tbody>{data.timeline.map((w) => <tr key={w.week_start} className="odd:bg-surface-2">
                   <th scope="row" className="py-2 pr-4 text-left font-normal whitespace-nowrap">{weekText(w.week_start)}</th><td className="pr-4 font-mono">{w.total}</td>
-                  {data.categories.map((c) => <td key={c.label} className="px-3">{w.counts[c.label] ?? 0}</td>)}
+                  {data.categories.filter((c) => c.label !== "unclassified").map((c) => <td key={c.label} className="px-3">{w.counts[c.label] ?? 0}</td>)}
                 </tr>)}</tbody>
               </table>
             </div>
@@ -121,7 +125,7 @@ export function AnalyticsInsights({ data, part }: { data: Insights; part: "timel
       <h2 className="font-serif text-xl font-semibold">Can this data be trusted?</h2>
       <dl className="mt-4 grid grid-cols-2 gap-x-6 gap-y-4 text-sm sm:grid-cols-2">
         <div><dt className="text-ink-dim">Without a date</dt><dd className="font-mono text-lg">{data.total_articles - datedTotal}</dd><dd className="text-xs text-ink-dim">{pct(data.total_articles - datedTotal, data.total_articles)} of articles</dd></div>
-        <div><dt className="text-ink-dim">Unclassified</dt><dd className="font-mono text-lg">{unclassified}</dd><dd className="text-xs text-ink-dim">{pct(unclassified, data.total_articles)} of articles</dd></div>
+        <div><dt className="text-ink-dim">Without a bias label</dt><dd className="font-mono text-lg">{unclassified}</dd><dd className="text-xs text-ink-dim">{pct(unclassified, data.total_articles)} of articles</dd></div>
       </dl>
       <div className="mt-6 grid gap-8 md:grid-cols-[2fr_1fr]">
         <div className="overflow-x-auto">

@@ -1,12 +1,27 @@
 "use client";
 
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import type { Chart } from "chart.js";
 import type { AnalyticsOverview, AnalyticsBucket } from "@/lib/analytics";
 import { sourceDisplayName } from "@/lib/constants";
 import { useI18n } from "@/lib/i18n/client";
 
-export function AnalyticsCharts({ data }: { data: AnalyticsOverview }) {
+export function AnalyticsCharts({ data: raw }: { data: AnalyticsOverview }) {
+  const data = useMemo(() => {
+    const classified = (buckets: AnalyticsBucket[]) => {
+      const visible = buckets.filter((b) => b.label !== "unclassified");
+      const total = visible.reduce((sum, b) => sum + b.count, 0);
+      return visible.map((b) => ({ ...b, percentage: total ? b.count * 100 / total : 0 }));
+    };
+    return {
+      ...raw,
+      bias_distribution: classified(raw.bias_distribution),
+      publishers: raw.publishers.map((p) => {
+        const buckets = classified(p.bias_distribution);
+        return { ...p, bias_distribution: buckets, article_count: buckets.reduce((sum, b) => sum + b.count, 0) };
+      }).filter((p) => p.article_count > 0),
+    };
+  }, [raw]);
   const { t } = useI18n();
   const labelText = useCallback(
     (label: AnalyticsBucket["label"]) => label === "unclassified" ? "Unclassified" : t.bias[label],
@@ -72,9 +87,16 @@ export function AnalyticsCharts({ data }: { data: AnalyticsOverview }) {
     return () => { disposed = true; observer?.disconnect(); media.removeEventListener("change", draw); charts.forEach((chart) => chart.destroy()); };
   }, [data, labelText]);
 
-  return <div className="space-y-12">
+  const legend = <div aria-label="Bias category legend" className="mt-4 flex flex-wrap gap-4 text-xs">
+    {data.bias_distribution.map((b) => <span key={b.label} className="inline-flex items-center gap-2">
+      <span aria-hidden="true" className="h-3 w-3 rounded-sm" style={{ backgroundColor: `var(--bias-${b.label.replaceAll("_", "-")})` }} />{labelText(b.label)}
+    </span>)}
+  </div>;
+  return <div className="space-y-10">
+    <p className="text-sm text-ink-dim">Bias charts and their tables include only articles with a recognized bias label. Shares use those articles as the total.</p>
     <section>
       <h2 className="font-serif text-xl font-semibold">What are the selected articles predicted as?</h2>
+      {legend}
       <div className="mt-4 h-72"><canvas ref={overallCanvas} role="img" aria-label="Article counts by predicted bias. Exact values are in the following table." /></div>
       <table className="[&_td]:px-2 [&_th]:px-2 mt-4 w-full text-sm">
         <caption className="sr-only">Overall predicted bias distribution</caption>

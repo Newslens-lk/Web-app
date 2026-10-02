@@ -28,7 +28,7 @@ export function EventCard({ event }: Props) {
     <Link
       href={`/events/${event.event_id}`}
       className={[
-        "editorial-story group relative flex min-w-0 flex-col overflow-hidden rounded-none border border-rule bg-surface shadow-1",
+        "editorial-story group relative flex min-w-0 flex-col overflow-hidden rounded-none border border-rule contrast-card bg-surface shadow-1",
         "transition-[box-shadow,transform,border-color] duration-200 ease-out",
         "hover:border-rule-strong hover:shadow-2",
       ].join(" ")}

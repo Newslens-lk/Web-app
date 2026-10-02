@@ -17,7 +17,7 @@ export default async function SourcesPage() {
           <Link
             key={source.source_name}
             href={`/articles?source=${encodeURIComponent(source.source_name)}`}
-            className="relative flex flex-col gap-2 overflow-hidden rounded-none border border-rule bg-surface p-5 shadow-1 transition-[box-shadow,transform,border-color] duration-200 ease-out hover:border-rule-strong hover:shadow-2"
+            className="relative flex flex-col gap-2 overflow-hidden rounded-none border border-rule contrast-card bg-surface p-5 shadow-1 transition-[box-shadow,transform,border-color] duration-200 ease-out hover:border-rule-strong hover:shadow-2"
           >
             {/* Tile and name on one line, everything about the outlet indented
                 under the name — so the eye runs down the column of tiles and

@@ -1,72 +1,134 @@
 import Link from "next/link";
-import { getSources } from "@/lib/api";
 import { getAnalytics } from "@/lib/analytics";
-import { BIAS_DISPLAY, BIAS_LABELS, sourceDisplayName } from "@/lib/constants";
 import { AnalyticsCharts } from "@/components/AnalyticsCharts";
+import { getDictionary } from "@/lib/i18n/server";
+
+type Period = "today" | "week" | "month" | "all";
+
+const PERIODS: Period[] = ["today", "week", "month", "all"];
+
+function periodDates(period: Period): { date_from?: string; date_to?: string } {
+  if (period === "all") return {};
+
+  const now = new Date();
+  const yyyy = now.getFullYear();
+  const mm = String(now.getMonth() + 1).padStart(2, "0");
+  const dd = String(now.getDate()).padStart(2, "0");
+  const today = `${yyyy}-${mm}-${dd}`;
+
+  if (period === "today") return { date_from: today, date_to: today };
+
+  if (period === "week") {
+    const day = now.getDay();
+    const mondayOffset = day === 0 ? 6 : day - 1;
+    const monday = new Date(now);
+    monday.setDate(now.getDate() - mondayOffset);
+    const mY = monday.getFullYear();
+    const mM = String(monday.getMonth() + 1).padStart(2, "0");
+    const mD = String(monday.getDate()).padStart(2, "0");
+    return { date_from: `${mY}-${mM}-${mD}`, date_to: today };
+  }
+
+  // month
+  return { date_from: `${yyyy}-${mm}-01`, date_to: today };
+}
+
+function periodLabel(period: Period, t: ReturnType<typeof getDictionary>) {
+  const map: Record<Period, string> = {
+    today: t.analytics.periodToday,
+    week: t.analytics.periodWeek,
+    month: t.analytics.periodMonth,
+    all: t.analytics.periodAll,
+  };
+  return map[period];
+}
 
 type Props = { searchParams: Record<string, string | string[] | undefined> };
 
 export default async function AnalyticsPage({ searchParams }: Props) {
+  const t = getDictionary();
+  const raw = typeof searchParams.period === "string" ? searchParams.period : "all";
+  const period: Period = PERIODS.includes(raw as Period) ? (raw as Period) : "all";
+
+  const dates = periodDates(period);
   const query = new URLSearchParams();
-  for (const key of ["source", "date_from", "date_to", "bias_label"]) {
-    const value = searchParams[key];
-    for (const item of Array.isArray(value) ? value : value ? [value] : []) {
-      if (item) query.append(key, item);
-    }
-  }
+  if (dates.date_from) query.set("date_from", dates.date_from);
+  if (dates.date_to) query.set("date_to", dates.date_to);
+
   const result = await getAnalytics(query);
-  let sourceOptions: string[] = [];
-  try { sourceOptions = (await getSources()).sources.map((s) => s.source_name); } catch { /* Filters remain usable on API failure. */ }
-  sourceOptions = Array.from(new Set([...sourceOptions, ...query.getAll("source")]));
   const data = result.data;
-  const inputClass = "mt-2 block w-full rounded-md border border-rule-strong bg-surface px-3 py-2 text-sm";
-  return <div className="space-y-6">
-    <header>
-      <p className="text-xs font-semibold uppercase tracking-widest text-amber">News insights</p>
-      <h1 className="mt-2 font-serif text-3xl font-semibold">How publishers cover the news</h1>
-      <p className="mt-2 text-sm text-ink-dim">Compare article predictions across publishers. These are model-generated estimates and may be wrong, not permanent ratings of news organisations.</p>
-    </header>
-    <form key={query.toString()} action="/analytics" method="get" className="rounded-lg border border-rule bg-surface p-5 space-y-4">
-      <div className="grid gap-4 sm:grid-cols-3">
-        <label className="text-sm font-semibold">Published from<input className={inputClass} name="date_from" type="date" defaultValue={query.get("date_from") ?? ""} /></label>
-        <label className="text-sm font-semibold">Published through<input className={inputClass} name="date_to" type="date" defaultValue={query.get("date_to") ?? ""} /></label>
-        <label className="text-sm font-semibold">Predicted bias<select name="bias_label" className={inputClass} defaultValue={query.get("bias_label") ?? ""}>
-          <option value="">All categories</option>
-          {BIAS_LABELS.map((label) => <option key={label} value={label}>{BIAS_DISPLAY[label]}</option>)}
-        </select></label>
-      </div>
-      <fieldset>
-        <legend className="text-sm font-semibold mb-2">Publishers <span className="font-normal text-ink-dim">— leave unchecked for all</span></legend>
-        <div className="flex flex-wrap gap-x-5 gap-y-3">
-          {sourceOptions.map((name) => <label key={name} className="inline-flex items-center gap-2 text-sm">
-            <input type="checkbox" name="source" value={name} defaultChecked={query.getAll("source").includes(name)} />{sourceDisplayName(name)}
-          </label>)}
-        </div>
-      </fieldset>
-      <div className="flex items-center gap-4">
-        <button className="rounded-md bg-brand px-4 py-2 text-sm font-semibold text-white" type="submit">Apply filters</button>
-        <Link href="/analytics" className="text-sm text-brand hover:underline">Reset</Link>
-      </div>
-      <p className="text-xs text-ink-dim">Dates use Sri Lanka time (Asia/Colombo). Both boundary dates are included. Topic and sentiment analysis will be available when those data are collected.</p>
-    </form>
-    {result.error && <p role="alert" className="rounded-lg border border-amber bg-amber-tint p-4 text-sm">{result.error}</p>}
-    {data && <>
-      <p className="text-sm text-ink-dim">Analysis period: {data.date_from ?? "Earliest available"} to {data.date_to ?? "Latest available"} · {data.timezone} · {data.bias_label ? BIAS_DISPLAY[data.bias_label] : "All bias categories"}</p>
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {[
-          ["Matching articles", data.total_articles], ["Distinct events", data.total_events],
-          ["Represented publishers", data.total_sources],
-          [data.date_from || data.date_to ? "Undated articles excluded" : "Articles missing dates", data.undated_excluded || data.missing_publication_dates],
-        ].map(([label, value]) => <div key={label} className="rounded-lg border border-rule bg-surface p-5">
-          <p className="font-mono text-3xl font-semibold">{Number(value).toLocaleString("en-US")}</p><p className="mt-2 text-sm text-ink-dim">{label}</p>
-        </div>)}
-      </div>
-      <p className="text-xs text-ink-dim">{data.date_from || data.date_to
-        ? "Undated articles matching the publisher and bias filters are excluded from this period. Collection dates are never substituted for publication dates."
-        : "All-time results include articles without a publication date."} Events are counted once even when several publishers cover them.</p>
-      {data.total_articles === 0
-        ? <p className="rounded-lg border border-rule bg-surface p-10 text-center text-ink-dim">No articles match these filters. Try a wider date range or reset the filters.</p>
-        : <AnalyticsCharts data={data} />}
-    </>}
-  </div>;
+
+  return (
+    <div className="space-y-8">
+      {/* Header */}
+      <header>
+        <p className="text-xs font-semibold uppercase tracking-widest text-amber">
+          {t.analytics.title}
+        </p>
+        <h1 className="mt-2 font-serif text-xl font-semibold">
+          {t.analytics.subtitle}
+        </h1>
+        <p className="mt-2 text-sm text-ink-dim">{t.analytics.description}</p>
+      </header>
+
+      {/* Period tabs */}
+      <nav className="flex rounded-[3px] border border-rule bg-surface-2 p-1">
+        {PERIODS.map((p) => (
+          <Link
+            key={p}
+            href={`/analytics?period=${p}`}
+            className={`flex-1 rounded-md px-3 py-2 text-center text-sm font-semibold transition-colors ${
+              period === p
+                ? "bg-surface text-ink shadow-1"
+                : "text-ink-dim hover:text-ink"
+            }`}
+          >
+            {periodLabel(p, t)}
+          </Link>
+        ))}
+      </nav>
+
+      {/* Error state */}
+      {result.error && (
+        <p
+          role="alert"
+          className="rounded-lg border border-amber bg-amber-tint p-4 text-sm"
+        >
+          {result.error}
+        </p>
+      )}
+
+      {data && (
+        <>
+          {/* Stat cards */}
+          <div className="grid gap-4 sm:grid-cols-3">
+            {([
+              [t.analytics.totalArticles, data.total_articles],
+              [t.analytics.totalEvents, data.total_events],
+              [t.analytics.totalSources, data.total_sources],
+            ] as const).map(([label, value]) => (
+              <div
+                key={label}
+                className="rounded-lg border border-rule bg-surface p-5"
+              >
+                <p className="font-mono text-3xl font-semibold">
+                  {Number(value).toLocaleString("en-US")}
+                </p>
+                <p className="mt-2 text-sm text-ink-dim">{label}</p>
+              </div>
+            ))}
+          </div>
+
+          {/* Charts or empty state */}
+          {data.total_articles === 0 ? (
+            <p className="rounded-lg border border-rule bg-surface p-10 text-center text-ink-dim">
+              {t.analytics.noData}
+            </p>
+          ) : (
+            <AnalyticsCharts data={data} />
+          )}
+        </>
+      )}
+    </div>
+  );
 }

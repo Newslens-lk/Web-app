@@ -20,5 +20,36 @@ services:
       timeout: 3s
       retries: 20
 
+  backend:
+    build: ./backend
+    env_file: ./backend/.env
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend/app:/app/app
+    environment:
+      DB_HOST: news-db-local
+      DB_PORT: 5432
+      DB_NAME: news_pipeline
+      DB_USER: news
+      DB_PASSWORD: news
+      CORS_ORIGINS: http://localhost:3000
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    depends_on:
+      news-db-local:
+        condition: service_healthy
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend/src:/app/src
+    environment:
+      NEXT_PUBLIC_API_BASE: http://backend:8000/api
+    command: npm run dev
+    depends_on:
+      - backend
+
 volumes:
   newslens_local_pgdata:

@@ -13,5 +13,5 @@ Thumbs.db
 .env.*
 !.env.example
 
-#docs
+# docs
 webapp-spec.md

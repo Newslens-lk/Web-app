@@ -86,8 +86,10 @@ export const en = {
     latestEvents: "Latest events",
     totalAndPage: (total: number, page: number) => `${total} total · page ${page}`,
     noEvents: "No events found.",
+    noEventsSearch: "No events match your search.",
     eventPages: "Event pages",
     atAGlance: "At a glance",
+    searchPlaceholder: "Search events…",
     eventMeta: (articles: number, sources: number, when: string) =>
       `${articles} article${articles !== 1 ? "s" : ""} · ${sources} source${sources !== 1 ? "s" : ""} · ${when}`,
   },
@@ -146,13 +148,27 @@ export const en = {
 
   analytics: {
     title: "Analytics",
+    subtitle: "How publishers cover the news",
+    description: "Compare predicted bias across publishers. These are model-generated estimates, not authoritative ratings.",
     totalArticles: "Total Articles",
     totalEvents: "Total Events",
+    totalSources: "Publishers",
     articlesToday: "Articles Today",
     eventsToday: "Events Today",
     biasDistribution: "Bias Distribution",
     articlesPerSource: "Articles per Source",
     lastRun: "Last pipeline run:",
+    periodToday: "Today",
+    periodWeek: "This Week",
+    periodMonth: "This Month",
+    periodAll: "All Time",
+    reportingVolume: "Reporting Volume",
+    reportingVolumeDesc: "Total articles published by each outlet in this period.",
+    biasByPublisher: "Bias by Publisher",
+    biasByPublisherDesc: "Predicted bias distribution for each outlet. Percentages are of that outlet's articles.",
+    noData: "No articles match this period. Try a wider time range.",
+    smallSample: "Small sample",
+    articles: "articles",
   },
 
   auth: {
@@ -304,9 +320,10 @@ export const si: Dictionary = {
     latestEvents: "නවතම සිදුවීම්",
     totalAndPage: (total: number, page: number) => `මුළු ${total} · පිටුව ${page}`,
     noEvents: "සිදුවීම් හමු නොවීය.",
+    noEventsSearch: "ඔබේ සෙවීමට ගැළපෙන සිදුවීම් නැත.",
     eventPages: "සිදුවීම් පිටු",
     atAGlance: "කෙටි විස්තර",
-    // Sinhala does not mark plurals here, so one form covers every count.
+    searchPlaceholder: "සිදුවීම් සොයන්න…",
     eventMeta: (articles: number, sources: number, when: string) =>
       `ලිපි ${articles} · ආයතන ${sources} · ${when}`,
   },
@@ -365,13 +382,27 @@ export const si: Dictionary = {
 
   analytics: {
     title: "විශ්ලේෂණ",
+    subtitle: "ප්‍රකාශකයින් ප්‍රවෘත්ති ආවරණය කරන ආකාරය",
+    description: "ප්‍රකාශකයින් හරහා පුරෝකථනය කළ නැඹුරුව සසඳන්න. මේවා ආකෘතියක් මඟින් ජනනය කළ ඇස්තමේන්තු මිස බලයලත් ඇගයීම් නොවේ.",
     totalArticles: "මුළු ලිපි",
     totalEvents: "මුළු සිදුවීම්",
+    totalSources: "ප්‍රකාශකයින්",
     articlesToday: "අද ලිපි",
     eventsToday: "අද සිදුවීම්",
     biasDistribution: "නැඹුරුව බෙදී ඇති ආකාරය",
     articlesPerSource: "ආයතනය අනුව ලිපි",
     lastRun: "අවසන් පයිප්ලයින් ධාවනය:",
+    periodToday: "අද",
+    periodWeek: "මෙම සතිය",
+    periodMonth: "මෙම මාසය",
+    periodAll: "සියල්ල",
+    reportingVolume: "වාර්තාකරණ පරිමාව",
+    reportingVolumeDesc: "මෙම කාලපරිච්ඡේදයේ එක් එක් ආයතනය ප්‍රකාශ කළ මුළු ලිපි ගණන.",
+    biasByPublisher: "ප්‍රකාශකයා අනුව නැඹුරුව",
+    biasByPublisherDesc: "එක් එක් ආයතනයේ පුරෝකථනය කළ නැඹුරු බෙදීම. ප්‍රතිශතය එම ආයතනයේ ලිපි වලිනි.",
+    noData: "මෙම කාලපරිච්ඡේදයට ගැළපෙන ලිපි නැත. පුළුල් කාල පරාසයක් උත්සාහ කරන්න.",
+    smallSample: "කුඩා සාම්පලය",
+    articles: "ලිපි",
   },
 
   auth: {

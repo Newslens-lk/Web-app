@@ -14,6 +14,7 @@ export default async function HomePage({ searchParams }: Props) {
   const params: Record<string, string> = {};
   if (searchParams.source) params.source = searchParams.source;
   if (searchParams.min_sources) params.min_sources = searchParams.min_sources;
+  if (searchParams.search) params.search = searchParams.search;
   if (searchParams.page) params.page = searchParams.page;
 
   const [eventList, stats] = await Promise.all([
@@ -100,7 +101,9 @@ export default async function HomePage({ searchParams }: Props) {
           </div>
 
           {eventList.events.length === 0 && (
-            <p className="text-ink-dim text-center py-12">{t.home.noEvents}</p>
+            <p className="text-ink-dim text-center py-12">
+              {searchParams.search ? t.home.noEventsSearch : t.home.noEvents}
+            </p>
           )}
 
           {totalPages > 1 && (

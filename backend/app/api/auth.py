@@ -10,6 +10,7 @@ from fastapi import (
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from app.core.config import get_settings
 from app.core.email import send_email
 from app.core.security import (
     create_session_token,
@@ -108,11 +109,13 @@ def require_admin(
 
 
 def _set_session_cookie(response: Response, user_id: int) -> None:
+    settings = get_settings()
+    is_production = settings.environment == "production"
     response.set_cookie(
         key=SESSION_COOKIE,
         value=create_session_token(user_id),
         httponly=True,
-        secure=False,
+        secure=is_production,
         samesite="lax",
         max_age=60 * 60 * 24 * 7,
         path="/",

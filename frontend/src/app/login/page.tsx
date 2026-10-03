@@ -14,7 +14,7 @@ export default function LoginPage() {
   const router = useRouter();
   const pathname = usePathname();
   const { t, locale } = useI18n();
-  const isAdminLogin = pathname.startsWith("/admin/login");
+  const isAdminLogin = pathname?.startsWith("/admin/login") ?? false;
   const [mode, setMode] = useState<Mode>("login");
   const [email, setEmail] = useState("");
   const [displayName, setDisplayName] = useState("");

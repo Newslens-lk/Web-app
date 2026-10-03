@@ -30,8 +30,15 @@ export const BIAS_ON_COLORS: Record<BiasLabel, string> = {
 
 export const BIAS_LABELS: BiasLabel[] = ["far_left", "left", "center", "right", "far_right"];
 
-// Bias names are translated, so they live in lib/i18n/dictionaries.ts under
-// `bias` rather than here — read them as `t.bias[label]`.
+// English display names for bias labels, used in server components that
+// cannot call the i18n hook. For translated names use `t.bias[label]`.
+export const BIAS_DISPLAY: Record<BiasLabel, string> = {
+  far_left: "Far Left",
+  left: "Left",
+  center: "Center",
+  right: "Right",
+  far_right: "Far Right",
+};
 
 // The outlets' own brand *colours* are deliberately not used as swatches: two
 // of them are a red and a blue, landing exactly where the bias scale puts

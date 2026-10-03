@@ -2,7 +2,7 @@ from datetime import datetime
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query
-from sqlalchemy import func, select
+from sqlalchemy import func, or_, select
 from sqlalchemy.orm import Session
 
 from app.core.article_images import usable_image_url
@@ -41,6 +41,7 @@ def list_events(
     page: int = Query(default=1, ge=1),
     page_size: int = Query(default=20, ge=1, le=50),
     topic: str | None = None,
+    search: str | None = None,
     source: str | None = None,
     date_from: datetime | None = None,
     date_to: datetime | None = None,
@@ -49,6 +50,11 @@ def list_events(
 ) -> EventList:
     stmt = select(Event)
 
+    if search:
+        pattern = f"%{search}%"
+        stmt = stmt.where(
+            or_(Event.summary.ilike(pattern), Event.topic.ilike(pattern))
+        )
     if topic:
         stmt = stmt.where(Event.topic == topic)
     if date_from:
@@ -66,7 +72,15 @@ def list_events(
 
     total = db.scalar(select(func.count()).select_from(stmt.subquery()))
 
-    stmt = stmt.order_by(Event.window_end.desc().nullslast())
+    # Sort events by the most recently scraped article in each event, so
+    # a story whose coverage just arrived always surfaces first.
+    latest_scrape = (
+        select(func.max(Article.scraped_at))
+        .where(Article.event_id == Event.event_id)
+        .correlate(Event)
+        .scalar_subquery()
+    )
+    stmt = stmt.order_by(latest_scrape.desc().nullslast())
     stmt = stmt.limit(page_size).offset((page - 1) * page_size)
     events = list(db.scalars(stmt))
 

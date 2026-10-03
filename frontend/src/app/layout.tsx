@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { IBM_Plex_Sans, Newsreader, Noto_Serif_Sinhala } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 import { Masthead } from "@/components/Masthead";
 import { Footer } from "@/components/Footer";
@@ -16,24 +16,27 @@ import { getDictionary, getLocale } from "@/lib/i18n/server";
  * or Plex, Sinhala gets a face actually drawn for it. Until now the stylesheet
  * named a Sinhala font but never loaded one, so every Sinhala headline was
  * rendering in whatever the OS happened to have.
+ *
+ * Fonts are loaded locally so the Docker build never needs to reach Google
+ * Fonts at build time.
  */
-const display = Newsreader({
-  subsets: ["latin"],
-  weight: ["400", "600", "700"],
+const display = localFont({
+  src: "../fonts/newsreader-latin.woff2",
+  weight: "400 700",
   variable: "--font-display",
   display: "swap",
 });
 
-const ui = IBM_Plex_Sans({
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
+const ui = localFont({
+  src: "../fonts/ibm-plex-sans-latin.woff2",
+  weight: "400 600",
   variable: "--font-ui",
   display: "swap",
 });
 
-const sinhala = Noto_Serif_Sinhala({
-  subsets: ["sinhala"],
-  weight: ["400", "600", "700"],
+const sinhala = localFont({
+  src: "../fonts/noto-serif-sinhala.woff2",
+  weight: "400 700",
   variable: "--font-sinhala",
   display: "swap",
 });

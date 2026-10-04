@@ -1,6 +1,5 @@
 import Link from "next/link";
 import type { EventSummary } from "@/lib/types";
-import { relativeTime } from "@/lib/api";
 import { getDictionary } from "@/lib/i18n/server";
 import { BiasBar } from "./BiasBar";
 import { ShineBorder } from "./ShineBorder";
@@ -84,11 +83,7 @@ export function EventCard({ event, lead = false }: Props) {
       </h3>
 
       <p className="text-sm text-ink-dim">
-        {t.home.eventMeta(
-          event.article_count,
-          event.source_count,
-          relativeTime(event.window_end, t),
-        )}
+        {event.article_count} {t.common.articles} · {event.source_count} {t.common.sources}
       </p>
 
       {/* The coverage, as a shape, with each position named inside its own

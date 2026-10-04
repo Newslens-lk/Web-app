@@ -169,6 +169,14 @@ export const en = {
     noData: "No articles match this period. Try a wider time range.",
     smallSample: "Small sample",
     articles: "articles",
+    dominantBias: "Most common:",
+    coverageTimeline: "Coverage Timeline",
+    coverageTimelineDesc: "Daily article volume over the selected period.",
+    biasTrend: "Bias Trend",
+    biasTrendDesc: "How the bias distribution shifts day by day.",
+    mostCovered: "Most Covered Stories",
+    mostCoveredDesc: "Events with the highest article count in this period.",
+    sourcesLabel: "sources",
   },
 
   auth: {
@@ -403,6 +411,14 @@ export const si: Dictionary = {
     noData: "මෙම කාලපරිච්ඡේදයට ගැළපෙන ලිපි නැත. පුළුල් කාල පරාසයක් උත්සාහ කරන්න.",
     smallSample: "කුඩා සාම්පලය",
     articles: "ලිපි",
+    dominantBias: "වඩාත් පොදු:",
+    coverageTimeline: "ආවරණ කාලරේඛාව",
+    coverageTimelineDesc: "තෝරාගත් කාලපරිච්ඡේදය තුළ දෛනික ලිපි පරිමාව.",
+    biasTrend: "නැඹුරු ප්‍රවණතාව",
+    biasTrendDesc: "නැඹුරු බෙදීම දිනෙන් දින වෙනස් වන ආකාරය.",
+    mostCovered: "වැඩිපුරම ආවරණය වූ පුවත්",
+    mostCoveredDesc: "මෙම කාලපරිච්ඡේදයේ වැඩිම ලිපි සංඛ්‍යාව සහිත සිදුවීම්.",
+    sourcesLabel: "ආයතන",
   },
 
   auth: {

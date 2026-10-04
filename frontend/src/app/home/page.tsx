@@ -4,7 +4,7 @@ import { FilterBar } from "@/components/FilterBar";
 import { EventCard } from "@/components/EventCard";
 import { DigitalClock } from "@/components/DigitalClock";
 import { WeatherWidget } from "@/components/WeatherWidget";
-import { getEvents, getStats } from "@/lib/api";
+import { getEvents } from "@/lib/api";
 import { getDictionary } from "@/lib/i18n/server";
 
 type Props = { searchParams: Record<string, string | undefined> };
@@ -17,10 +17,7 @@ export default async function HomePage({ searchParams }: Props) {
   if (searchParams.search) params.search = searchParams.search;
   if (searchParams.page) params.page = searchParams.page;
 
-  const [eventList, stats] = await Promise.all([
-    getEvents(params),
-    getStats(),
-  ]);
+  const eventList = await getEvents(params);
 
   const totalPages = Math.ceil(eventList.total / eventList.page_size);
 
@@ -47,21 +44,7 @@ export default async function HomePage({ searchParams }: Props) {
 
   return (
     <>
-      {/* The page arrives in three bands — what is here, how to narrow it,
-          then the stories. Short delays: this is a page to read, not a cover,
-          and anything slower would be in the way by the third visit. */}
-      <p
-        className="rise-in mb-7 font-mono text-sm uppercase tracking-eyebrow tabular-nums text-ink-faint"
-        style={{ "--delay": "0ms" } as CSSProperties}
-      >
-        {stats.total_articles} {t.common.articles}
-        <span className="mx-2 text-rule-strong">/</span>
-        {stats.total_events} {t.common.events}
-        <span className="mx-2 text-rule-strong">/</span>
-        {stats.total_sources} {t.common.sources}
-      </p>
-
-      <div className="rise-in" style={{ "--delay": "80ms" } as CSSProperties}>
+      <div className="rise-in" style={{ "--delay": "0ms" } as CSSProperties}>
         <Suspense>
           <FilterBar />
         </Suspense>
@@ -76,13 +59,10 @@ export default async function HomePage({ searchParams }: Props) {
         style={{ "--delay": "160ms" } as CSSProperties}
       >
         <div>
-          <div className="mb-5 flex flex-wrap items-baseline justify-between gap-2 border-b-2 border-ink pb-2">
+          <div className="mb-5 border-b-2 border-ink pb-2">
             <h2 className="font-serif text-base font-semibold uppercase tracking-eyebrow">
               {t.home.latestEvents}
             </h2>
-            <span className="font-mono text-sm tabular-nums text-ink-faint">
-              {t.home.totalAndPage(eventList.total, eventList.page)}
-            </span>
           </div>
 
           {/* The most-covered story leads at full width; the rest follow in

@@ -80,6 +80,8 @@ export function FilterBar() {
           <option value="lankadeepa">Lankadeepa</option>
           <option value="newsfirst">NewsFirst</option>
           <option value="divaina">Divaina</option>
+          <option value="Ada">Ada</option>
+          <option value="Ada Derana Sinhala">Ada Derana Sinhala</option>
         </select>
         <select
           aria-label={t.filters.minimumSources}

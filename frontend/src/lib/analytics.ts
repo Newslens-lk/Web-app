@@ -25,23 +25,55 @@ export type AnalyticsOverview = {
   }[];
 };
 
-export async function getAnalytics(query: URLSearchParams): Promise<
-  { data: AnalyticsOverview; error?: never; status?: never } |
-  { data?: never; error: string; status: number }
+export type TimelineDay = {
+  date: string;
+  total: number;
+  bias: Record<string, number>;
+};
+
+export type TimelineResponse = {
+  days: TimelineDay[];
+};
+
+export type TopEvent = {
+  event_id: string;
+  title: string;
+  article_count: number;
+  source_count: number;
+  bias_distribution: Record<string, number>;
+};
+
+export type TopEventsResponse = {
+  events: TopEvent[];
+};
+
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "http://localhost:8000/api";
+
+async function safeFetch<T>(url: string): Promise<
+  { data: T; error?: never } | { data?: never; error: string }
 > {
-  const base = process.env.NEXT_PUBLIC_API_BASE ?? "http://localhost:8000/api";
   try {
-    const response = await fetch(`${base}/analytics/overview?${query}`, {
-      cache: "no-store",
-    });
+    const response = await fetch(url, { cache: "no-store" });
     if (!response.ok) {
       const messages: Record<number, string> = {
         422: "Check your filters: dates must be valid and the start must not be after the end.",
       };
-      return { status: response.status, error: messages[response.status] ?? "Analytics is temporarily unavailable. Please try again." };
+      return { error: messages[response.status] ?? "Analytics is temporarily unavailable. Please try again." };
     }
-    return { data: await response.json() as AnalyticsOverview };
+    return { data: await response.json() as T };
   } catch {
-    return { status: 503, error: "Analytics is temporarily unavailable. Please try again." };
+    return { error: "Analytics is temporarily unavailable. Please try again." };
   }
+}
+
+export function getAnalytics(query: URLSearchParams) {
+  return safeFetch<AnalyticsOverview>(`${API_BASE}/analytics/overview?${query}`);
+}
+
+export function getTimeline(query: URLSearchParams) {
+  return safeFetch<TimelineResponse>(`${API_BASE}/analytics/timeline?${query}`);
+}
+
+export function getTopEvents(query: URLSearchParams) {
+  return safeFetch<TopEventsResponse>(`${API_BASE}/analytics/top-events?${query}`);
 }

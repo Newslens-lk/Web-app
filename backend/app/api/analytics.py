@@ -8,7 +8,17 @@ from sqlalchemy.orm import Session
 
 from app.db.session import get_db
 from app.models.article import Article
-from app.schemas.analytics import AnalyticsOverview, BiasCategory, BiasCount, PublisherAnalytics
+from app.models.event import Event
+from app.schemas.analytics import (
+    AnalyticsOverview,
+    BiasCategory,
+    BiasCount,
+    PublisherAnalytics,
+    TimelineDay,
+    TimelineResponse,
+    TopEvent,
+    TopEventsResponse,
+)
 from app.schemas.event import BIAS_LABELS
 
 COLOMBO = timezone(timedelta(hours=5, minutes=30))
@@ -92,3 +102,95 @@ def overview(
             )
         ],
     )
+
+
+@router.get("/timeline", response_model=TimelineResponse)
+def timeline(
+    response: Response,
+    date_from: date | None = None,
+    date_to: date | None = None,
+    db: Session = Depends(get_db),
+) -> TimelineResponse:
+    """Daily article counts with per-day bias breakdown."""
+    response.headers["Cache-Control"] = "no-store"
+    if date_from and date_to and date_from > date_to:
+        raise HTTPException(status_code=422, detail="Start date must not be after end date")
+
+    normalized = func.lower(func.trim(Article.bias_label))
+    label = case((normalized.in_(BIAS_LABELS), normalized), else_="unclassified")
+    pub_date = func.date(func.timezone("Asia/Colombo", Article.published_at))
+
+    conditions = [Article.published_at.isnot(None)]
+    if date_from:
+        conditions.append(Article.published_at >= datetime.combine(date_from, time.min, COLOMBO))
+    if date_to:
+        conditions.append(Article.published_at <= datetime.combine(date_to, time.max, COLOMBO))
+
+    rows = db.execute(
+        select(pub_date, label, func.count())
+        .where(*conditions)
+        .group_by(pub_date, label)
+        .order_by(pub_date)
+    ).all()
+
+    days: dict[date, dict[str, int]] = {}
+    for day, category, count in rows:
+        days.setdefault(day, dict.fromkeys(CATEGORIES, 0))[category] += count
+
+    return TimelineResponse(
+        days=[
+            TimelineDay(
+                date=d,
+                total=sum(counts.values()),
+                bias=counts,
+            )
+            for d, counts in sorted(days.items())
+        ]
+    )
+
+
+@router.get("/top-events", response_model=TopEventsResponse)
+def top_events(
+    response: Response,
+    date_from: date | None = None,
+    date_to: date | None = None,
+    limit: int = Query(default=5, ge=1, le=20),
+    db: Session = Depends(get_db),
+) -> TopEventsResponse:
+    """Events with the most articles in the given period."""
+    response.headers["Cache-Control"] = "no-store"
+
+    conditions = []
+    if date_from:
+        conditions.append(Event.window_start >= datetime.combine(date_from, time.min, COLOMBO))
+    if date_to:
+        conditions.append(Event.window_end <= datetime.combine(date_to, time.max, COLOMBO))
+
+    stmt = (
+        select(Event)
+        .where(*conditions)
+        .order_by(Event.article_count.desc())
+        .limit(limit)
+    )
+    events = list(db.scalars(stmt))
+
+    result = []
+    for event in events:
+        articles = db.execute(
+            select(Article.bias_label)
+            .where(Article.event_id == event.event_id)
+        ).all()
+        bias: dict[str, int] = dict.fromkeys(BIAS_LABELS, 0)
+        for (raw_label,) in articles:
+            label_str = (raw_label or "").strip().lower()
+            if label_str in bias:
+                bias[label_str] += 1
+        result.append(TopEvent(
+            event_id=str(event.event_id),
+            title=event.summary or "Untitled event",
+            article_count=event.article_count,
+            source_count=event.source_count,
+            bias_distribution=bias,
+        ))
+
+    return TopEventsResponse(events=result)

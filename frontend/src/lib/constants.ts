@@ -54,6 +54,8 @@ export const SOURCE_LOGOS: Record<string, string> = {
   lankadeepa: "/logos/lankadeepa.png",
   newsfirst: "/logos/newsfirst.jpg",
   divaina: "/logos/divaina.png",
+  Ada: "/logos/ada.svg",
+  "Ada Derana Sinhala": "/logos/adaderana_sinhala.svg",
 };
 
 export const SOURCE_DISPLAY: Record<string, string> = {
@@ -62,6 +64,8 @@ export const SOURCE_DISPLAY: Record<string, string> = {
   lankadeepa: "Lankadeepa",
   newsfirst: "NewsFirst",
   divaina: "Divaina",
+  Ada: "Ada",
+  "Ada Derana Sinhala": "Ada Derana Sinhala",
 };
 
 export function sourceDisplayName(name: string): string {

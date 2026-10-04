@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getAnalytics } from "@/lib/analytics";
+import { getAnalytics, getTimeline, getTopEvents } from "@/lib/analytics";
 import { AnalyticsCharts } from "@/components/AnalyticsCharts";
 import { getDictionary } from "@/lib/i18n/server";
 
@@ -55,8 +55,16 @@ export default async function AnalyticsPage({ searchParams }: Props) {
   if (dates.date_from) query.set("date_from", dates.date_from);
   if (dates.date_to) query.set("date_to", dates.date_to);
 
-  const result = await getAnalytics(query);
-  const data = result.data;
+  const [overviewResult, timelineResult, topEventsResult] = await Promise.all([
+    getAnalytics(query),
+    getTimeline(query),
+    getTopEvents(query),
+  ]);
+
+  const data = overviewResult.data;
+  const timeline = timelineResult.data;
+  const topEvents = topEventsResult.data;
+  const error = overviewResult.error || timelineResult.error || topEventsResult.error;
 
   return (
     <div className="space-y-8">
@@ -89,35 +97,66 @@ export default async function AnalyticsPage({ searchParams }: Props) {
       </nav>
 
       {/* Error state */}
-      {result.error && (
+      {error && (
         <p
           role="alert"
           className="rounded-lg border border-amber bg-amber-tint p-4 text-sm"
         >
-          {result.error}
+          {error}
         </p>
       )}
 
       {data && (
         <>
-          {/* Stat cards */}
-          <div className="grid gap-4 sm:grid-cols-3">
-            {([
-              [t.analytics.totalArticles, data.total_articles],
-              [t.analytics.totalEvents, data.total_events],
-              [t.analytics.totalSources, data.total_sources],
-            ] as const).map(([label, value]) => (
-              <div
-                key={label}
-                className="rounded-lg border border-rule bg-surface p-5"
-              >
-                <p className="font-mono text-3xl font-semibold">
-                  {Number(value).toLocaleString("en-US")}
-                </p>
-                <p className="mt-2 text-sm text-ink-dim">{label}</p>
+          {/* Stat cards — dominant bias as 4th card */}
+          {(() => {
+            const classifiedDist = data.bias_distribution.filter((b) => b.label !== "unclassified");
+            const dominant = classifiedDist.reduce((a, b) => (b.count > a.count ? b : a), classifiedDist[0]);
+            return (
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                {([
+                  [t.analytics.totalArticles, data.total_articles],
+                  [t.analytics.totalEvents, data.total_events],
+                  [t.analytics.totalSources, data.total_sources],
+                ] as const).map(([label, value]) => (
+                  <div
+                    key={label}
+                    className="rounded-lg border border-rule bg-surface p-5"
+                  >
+                    <p className="font-mono text-3xl font-semibold">
+                      {Number(value).toLocaleString("en-US")}
+                    </p>
+                    <p className="mt-2 text-sm text-ink-dim">{label}</p>
+                  </div>
+                ))}
+                {data.total_articles > 0 && (
+                  <div className="rounded-lg border border-rule bg-surface p-5">
+                    <p className="font-mono text-3xl font-semibold">
+                      {dominant.percentage.toFixed(0)}%
+                    </p>
+                    <p className="mt-2 text-sm text-ink-dim">
+                      {t.analytics.dominantBias}{" "}
+                      <span
+                        className="inline-block rounded-sm px-1.5 py-0.5 text-xs font-semibold"
+                        style={{
+                          backgroundColor:
+                            dominant.label === "unclassified"
+                              ? "var(--ink-faint)"
+                              : `var(--bias-${dominant.label.replaceAll("_", "-")})`,
+                          color:
+                            dominant.label === "unclassified"
+                              ? "var(--ink)"
+                              : `var(--bias-${dominant.label.replaceAll("_", "-")}-on)`,
+                        }}
+                      >
+                        {t.bias[dominant.label as keyof typeof t.bias] ?? dominant.label}
+                      </span>
+                    </p>
+                  </div>
+                )}
               </div>
-            ))}
-          </div>
+            );
+          })()}
 
           {/* Charts or empty state */}
           {data.total_articles === 0 ? (
@@ -125,7 +164,11 @@ export default async function AnalyticsPage({ searchParams }: Props) {
               {t.analytics.noData}
             </p>
           ) : (
-            <AnalyticsCharts data={data} />
+            <AnalyticsCharts
+              data={data}
+              timeline={timeline ?? undefined}
+              topEvents={topEvents ?? undefined}
+            />
           )}
         </>
       )}

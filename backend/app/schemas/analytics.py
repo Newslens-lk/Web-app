@@ -31,3 +31,25 @@ class AnalyticsOverview(BaseModel):
     undated_excluded: int
     bias_distribution: list[BiasCount]
     publishers: list[PublisherAnalytics]
+
+
+class TimelineDay(BaseModel):
+    date: date
+    total: int
+    bias: dict[str, int]
+
+
+class TimelineResponse(BaseModel):
+    days: list[TimelineDay]
+
+
+class TopEvent(BaseModel):
+    event_id: str
+    title: str
+    article_count: int
+    source_count: int
+    bias_distribution: dict[str, int]
+
+
+class TopEventsResponse(BaseModel):
+    events: list[TopEvent]

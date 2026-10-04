@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import { sourceDisplayName, sourceLogo } from "@/lib/constants";
 
 type Props = {
@@ -14,11 +17,38 @@ const TILE = {
   lg: "h-11 w-11 rounded-[6px] p-1",
 };
 
+const INITIALS_TEXT = {
+  sm: "text-[9px]",
+  md: "text-xs",
+  lg: "text-sm",
+};
+
 const NAME = {
   sm: "text-sm",
   md: "text-base",
   lg: "text-md",
 };
+
+function initials(name: string): string {
+  return name
+    .split(/[\s_]+/)
+    .map((w) => w[0])
+    .join("")
+    .toUpperCase()
+    .slice(0, 3);
+}
+
+function InitialsTile({ name, size }: { name: string; size: "sm" | "md" | "lg" }) {
+  return (
+    <span
+      className={`flex shrink-0 items-center justify-center overflow-hidden border border-rule bg-surface-2 ${TILE[size]}`}
+    >
+      <span className={`font-semibold leading-none text-ink-dim ${INITIALS_TEXT[size]}`}>
+        {initials(name)}
+      </span>
+    </span>
+  );
+}
 
 /**
  * An outlet's identity.
@@ -29,26 +59,18 @@ const NAME = {
  * with the logo contained inside costs some empty space on the wide ones and
  * buys a column that actually scans.
  *
- * The tile stays white in both themes. These are opaque logos with their own
- * backgrounds, so a tinted tile would fight them — and a light chip on a dark
- * page reads as a deliberate app-icon, which is the effect wanted.
- *
- * An outlet with no logo file falls back to its name in small caps, so a new
- * source from the pipeline never renders as a blank square.
+ * When a logo fails to load or no logo file is configured, the tile shows
+ * the outlet's initials on a neutral background so it never renders as a
+ * blank white box.
  */
 export function SourceBadge({ name, size = "sm", showName = false }: Props) {
   const logo = sourceLogo(name);
   const label = sourceDisplayName(name);
+  const [imgFailed, setImgFailed] = useState(false);
 
-  if (!logo) {
-    return (
-      <span className="inline-block border border-rule px-1.5 py-[2px] text-xs font-medium uppercase tracking-eyebrow text-ink-dim">
-        {label}
-      </span>
-    );
-  }
+  const showLogo = logo && !imgFailed;
 
-  const tile = (
+  const tile = showLogo ? (
     <span
       className={`flex shrink-0 items-center justify-center overflow-hidden border border-rule bg-white ${TILE[size]}`}
     >
@@ -57,9 +79,12 @@ export function SourceBadge({ name, size = "sm", showName = false }: Props) {
         src={logo}
         alt={showName ? "" : label}
         loading="lazy"
+        onError={() => setImgFailed(true)}
         className="max-h-full max-w-full object-contain"
       />
     </span>
+  ) : (
+    <InitialsTile name={label} size={size} />
   );
 
   if (!showName) {

@@ -61,7 +61,7 @@ export function FilterBar() {
         />
         <button
           type="submit"
-          className="rounded-md bg-brand px-4 py-[9px] text-sm font-semibold text-white hover:opacity-90"
+          className="rounded-md bg-brand px-4 py-[9px] text-sm font-semibold text-brand-ink hover:brightness-95"
         >
           {t.filters.searchNews}
         </button>

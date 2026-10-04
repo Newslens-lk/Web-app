@@ -16,7 +16,7 @@ type Props = HTMLAttributes<HTMLDivElement> & {
  * needs `relative` and `overflow-hidden`, and this inherits its radius:
  *
  *     <div className="relative overflow-hidden rounded-[3px] border …">
- *       <ShineBorder shineColor={["#5b2545", "#d9b65c"]} />
+ *       <ShineBorder shineColor={["#c48820", "#E8A838"]} />
  *       …
  *     </div>
  *

@@ -6,13 +6,13 @@ import { BIAS_COLORS, BIAS_LABELS } from "@/lib/constants";
 
 export function Masthead() {
   return (
-    <header className="sticky top-0 z-30 border-b border-rule bg-surface">
+    <header className="sticky top-0 z-30 border-b border-rule bg-masthead">
       <div className="mx-auto flex max-w-shell items-center gap-5 px-4 py-3.5 sm:px-6">
         <Link
           href="/"
           className="font-serif text-xl font-semibold leading-none tracking-[-0.03em]"
         >
-          news<span className="text-brand">Lens</span>
+          Newslens<span className="text-brand">.lk</span>
         </Link>
         <Nav />
         <LanguageToggle />

@@ -26,7 +26,7 @@ export default async function SourcesPage() {
             <ShineBorder
               borderWidth={2}
               duration={11 + i}
-              shineColor={["#5b2545", "#d9b65c", "#d9a3c4"]}
+              shineColor={["#c48820", "#E8A838", "#f5c563"]}
             />
             {/* Tile and name on one line, everything about the outlet indented
                 under the name — so the eye runs down the column of tiles and

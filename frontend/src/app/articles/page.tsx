@@ -77,7 +77,7 @@ export default async function ArticlesPage({ searchParams }: Props) {
             <ShineBorder
               borderWidth={1}
               duration={13 + (article.article_id.charCodeAt(0) % 5)}
-              shineColor={["#5b2545", "#d9b65c", "#d9a3c4"]}
+              shineColor={["#c48820", "#E8A838", "#f5c563"]}
             />
             <ArticleImage
               src={article.image_url}

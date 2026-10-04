@@ -43,7 +43,7 @@ const sinhala = localFont({
 
 export function generateMetadata(): Metadata {
   return {
-    title: "NewsLens",
+    title: "Newslens.lk",
     description: getDictionary().meta.description,
   };
 }

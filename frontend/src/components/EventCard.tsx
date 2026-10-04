@@ -49,7 +49,7 @@ export function EventCard({ event, lead = false }: Props) {
       <ShineBorder
         borderWidth={1}
         duration={13 + (event.event_id.charCodeAt(0) % 5)}
-        shineColor={["#5b2545", "#d9b65c", "#d9a3c4"]}
+        shineColor={["#c48820", "#E8A838", "#f5c563"]}
       />
       {/* Flush to the card's edges — an image inset inside its own padding is
           what makes a card look like a slide rather than a page. */}

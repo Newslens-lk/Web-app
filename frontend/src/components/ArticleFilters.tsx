@@ -99,7 +99,7 @@ export function ArticleFilters({ search, source, biasLabel, dateFrom, dateTo }: 
           {t.filters.to}
           <input name="date_to" type="date" defaultValue={inputDateValue(dateTo)} className={inputClass} />
         </label>
-        <button type="submit" className="rounded-md bg-brand px-4 py-[10px] text-sm font-semibold text-white hover:opacity-90">
+        <button type="submit" className="rounded-md bg-brand px-4 py-[10px] text-sm font-semibold text-brand-ink hover:brightness-95">
           {t.filters.apply}
         </button>
         {(search || source || biasLabel || dateFrom || dateTo) && (

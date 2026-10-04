@@ -57,6 +57,7 @@ const config: Config = {
         "brand-tint": "var(--brand-tint)",
         amber: "var(--amber)",
         "amber-tint": "var(--amber-tint)",
+        masthead: "var(--masthead)",
       },
       fontFamily: {
         serif: ["var(--font-serif)"],

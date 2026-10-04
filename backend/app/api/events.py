@@ -52,8 +52,18 @@ def list_events(
 
     if search:
         pattern = f"%{search}%"
+        # Search across event title, summary, topic, and article titles.
         stmt = stmt.where(
-            or_(Event.summary.ilike(pattern), Event.topic.ilike(pattern))
+            or_(
+                Event.representative_title.ilike(pattern),
+                Event.summary.ilike(pattern),
+                Event.topic.ilike(pattern),
+                Event.event_id.in_(
+                    select(Article.event_id)
+                    .where(Article.title.ilike(pattern))
+                    .distinct()
+                ),
+            )
         )
     if topic:
         stmt = stmt.where(Event.topic == topic)
@@ -92,7 +102,7 @@ def list_events(
             .order_by(Article.published_at.desc().nullslast())
         ).all()
 
-        rep_title = event.summary or (rows[0][0] if rows else "Untitled event")
+        rep_title = event.representative_title or (rows[0][0] if rows else "Untitled event")
         sources_list = sorted({r[1] for r in rows})
         image_url = next(
             (url for row in rows if len(row) > 3 and (url := usable_image_url(row[3]))),

@@ -15,6 +15,7 @@ class Event(Base):
 
     event_id: Mapped[str] = mapped_column(Uuid, primary_key=True)
 
+    representative_title: Mapped[str | None] = mapped_column(Text, nullable=True)
     summary: Mapped[str | None] = mapped_column(Text, nullable=True)
     topic: Mapped[str | None] = mapped_column(String, nullable=True)
 

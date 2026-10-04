@@ -93,30 +93,3 @@ export type SourceInfo = {
   article_count: number;
   latest_article_at: string | null;
 };
-
-export type Stats = {
-  total_articles: number;
-  total_events: number;
-  total_sources: number;
-  articles_today: number;
-  events_today: number;
-  bias_breakdown: Record<string, number>;
-  articles_per_source: Record<string, number>;
-  last_pipeline_run: string | null;
-};
-
-export type User = {
-  id: number;
-  email: string;
-  display_name: string;
-  role: string;
-  created_at: string;
-};
-
-export type PipelineRun = {
-  dag_run_id: string;
-  state: string;
-  start_date: string | null;
-  end_date: string | null;
-  tasks: { task_id: string; state: string; duration: number | null }[];
-};

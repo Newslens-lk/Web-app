@@ -7,6 +7,7 @@ import { SourceBadge } from "@/components/SourceBadge";
 import { getDateLocale, getDictionary } from "@/lib/i18n/server";
 import { ArticleImage } from "@/components/ArticleImage";
 import { ShineBorder } from "@/components/ShineBorder";
+import { SummarizeButton } from "@/components/SummarizeButton";
 
 type Props = { params: { eventId: string } };
 
@@ -31,7 +32,12 @@ export default async function EventDetailPage({ params }: Props) {
         &larr; {t.event.backToEvents}
       </Link>
 
-      <h1 className="font-serif text-xl font-semibold leading-[1.2] text-balance">
+      {detail.topic && (
+        <span className="text-xs font-semibold uppercase tracking-eyebrow text-amber">
+          {detail.topic}
+        </span>
+      )}
+      <h1 className="mt-1 font-serif text-xl font-semibold leading-[1.2] text-balance">
         {headline}
       </h1>
       <p className="text-sm text-ink-faint mt-2">
@@ -47,6 +53,8 @@ export default async function EventDetailPage({ params }: Props) {
             : "",
         )}
       </p>
+
+      <SummarizeButton eventId={params.eventId} initialSummary={detail.summary} />
 
       <div className="mt-7">
         <h2 className="mb-2 text-xs font-semibold uppercase tracking-eyebrow text-ink-dim">

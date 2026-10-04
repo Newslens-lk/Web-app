@@ -42,6 +42,7 @@ def create_auth_tables() -> None:
 
     with engine.begin() as connection:
         connection.execute(text("ALTER TABLE articles ADD COLUMN IF NOT EXISTS image_url TEXT"))
+        connection.execute(text("ALTER TABLE events ADD COLUMN IF NOT EXISTS representative_title TEXT"))
         # create() above skips a users table that already exists, so a column
         # added after the first deployment needs this too.
         connection.execute(

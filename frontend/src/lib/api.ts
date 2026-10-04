@@ -4,10 +4,7 @@ import type {
   ArticleDetail,
   SimilarArticle,
   SourceInfo,
-  Stats,
-  PipelineRun,
   ArticleSummary,
-  User,
 } from "./types";
 import type { Dictionary } from "./i18n/dictionaries";
 
@@ -16,7 +13,6 @@ const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "http://localhost:8000/api"
 async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(`${API_BASE}${path}`, {
     cache: "no-store",
-    credentials: "include",
     ...init,
   });
   if (!res.ok) {
@@ -31,39 +27,6 @@ async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
   }
   if (res.status === 204) return undefined as T;
   return res.json() as Promise<T>;
-}
-
-export function registerUser(payload: {
-  email: string;
-  display_name: string;
-  password: string;
-  /** Interface language, so the welcome email matches what they are reading. */
-  locale: string;
-}): Promise<{ user: User }> {
-  return apiFetch("/auth/register", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
-  });
-}
-
-export function loginUser(payload: {
-  email: string;
-  password: string;
-}): Promise<{ user: User }> {
-  return apiFetch("/auth/login", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
-  });
-}
-
-export function getCurrentUser(): Promise<User> {
-  return apiFetch<User>("/auth/me");
-}
-
-export function logoutUser(): Promise<void> {
-  return apiFetch<void>("/auth/logout", { method: "POST" });
 }
 
 export function getEvents(params?: Record<string, string>): Promise<EventList> {
@@ -92,29 +55,10 @@ export function getSources(): Promise<{ sources: SourceInfo[] }> {
   return apiFetch(`/sources`);
 }
 
-export function getStats(): Promise<Stats> {
-  return apiFetch<Stats>(`/stats`);
+export function summarizeEvent(eventId: string): Promise<{ event_id: string; summary: string; topic: string | null }> {
+  return apiFetch(`/events/${eventId}/summarize`, { method: "POST" });
 }
 
-export function triggerPipeline(): Promise<{ dag_run_id: string; state: string }> {
-  return apiFetch(`/admin/pipeline/trigger`, {
-    method: "POST",
-  });
-}
-
-export function getPipelineStatus(): Promise<{ runs: PipelineRun[] }> {
-  return apiFetch(`/admin/pipeline/status`);
-}
-
-export function getPipelineHistory(limit = 20): Promise<{ runs: PipelineRun[] }> {
-  return apiFetch(`/admin/pipeline/history?limit=${limit}`);
-}
-
-/**
- * "5m ago" / "මිනිත්තු 5කට පෙර". The caller passes the dictionary because the
- * two languages order the number and the unit differently, so this cannot be
- * built by concatenating a translated suffix.
- */
 export function relativeTime(iso: string | null, t: Dictionary): string {
   if (!iso) return t.time.recently;
   const diff = Math.floor((Date.now() - new Date(iso).getTime()) / 60000);

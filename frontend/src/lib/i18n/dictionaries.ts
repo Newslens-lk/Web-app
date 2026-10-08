@@ -118,7 +118,7 @@ export const en = {
     articles: "Articles",
     meta: (articles: number, sources: number, date: string) =>
       `${articles} article${articles !== 1 ? "s" : ""} from ${sources} source${sources !== 1 ? "s" : ""}${date ? ` · ${date}` : ""}`,
-    summarize: "Summarize with AI",
+    summarize: "Summarize",
     summarizing: "Generating summary…",
     summaryTitle: "AI Summary",
     summaryError: "Failed to generate summary. Please try again.",
@@ -364,7 +364,7 @@ export const si: Dictionary = {
     articles: "ලිපි",
     meta: (articles: number, sources: number, date: string) =>
       `ආයතන ${sources}ක් වෙතින් ලිපි ${articles}ක්${date ? ` · ${date}` : ""}`,
-    summarize: "AI මඟින් සාරාංශ කරන්න",
+    summarize: "සාරාංශ කරන්න",
     summarizing: "සාරාංශය ජනනය වෙමින්…",
     summaryTitle: "AI සාරාංශය",
     summaryError: "සාරාංශය ජනනය කිරීමට නොහැකි විය. නැවත උත්සාහ කරන්න.",

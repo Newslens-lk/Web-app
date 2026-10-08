@@ -21,13 +21,13 @@ export default async function EventDetailPage({ params }: Props) {
     notFound();
   }
 
-  const headline = detail.summary ?? detail.articles[0]?.title ?? t.event.untitled;
+  const headline = detail.representative_title || detail.articles[0]?.title || t.event.untitled;
 
   return (
     <div className="rise-in max-w-[900px] py-4">
       <Link
         href="/home"
-        className="inline-block text-sm font-semibold text-brand hover:underline mb-4"
+        className="inline-block text-sm font-semibold text-brand hover:underline mb-6"
       >
         &larr; {t.event.backToEvents}
       </Link>
@@ -78,11 +78,13 @@ export default async function EventDetailPage({ params }: Props) {
               duration={13 + (article.article_id.charCodeAt(0) % 5)}
               shineColor={["#c48820", "#E8A838", "#f5c563"]}
             />
-            <ArticleImage
-              src={article.image_url}
-              alt={article.title}
-              className="h-40 w-full rounded-md object-cover"
-            />
+            {article.image_url && (
+              <ArticleImage
+                src={article.image_url}
+                alt={article.title}
+                className="h-40 w-full rounded-md object-cover"
+              />
+            )}
             <div className="flex items-center justify-between gap-2">
               <SourceBadge name={article.source_name} showName />
               <BiasLabel

@@ -239,8 +239,11 @@ def generate_summary(
 
     # If the topic wasn't assigned yet, do it now while we have the articles.
     if not event.topic or force:
-        raw = _chat(client, _TOPIC_SYSTEM_PROMPT, _build_titles_message(articles), 32)
-        event.topic = raw.lower() if raw.lower() in TOPIC_TAXONOMY else "other"
+        raw = _chat(client, _TOPIC_SYSTEM_PROMPT, _build_titles_message(articles), 128)
+        title, topic = _parse_topic_response(raw)
+        event.topic = topic
+        if title:
+            event.representative_title = title
 
     db.commit()
 

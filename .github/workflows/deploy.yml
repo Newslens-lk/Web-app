@@ -1,0 +1,82 @@
+name: Test & Deploy Web App
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  test-backend:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: pgvector/pgvector:pg16
+        env:
+          POSTGRES_DB: news_pipeline
+          POSTGRES_USER: news
+          POSTGRES_PASSWORD: news
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U news -d news_pipeline"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          cd backend
+          pip install -r requirements.txt
+          pip install -r requirements-dev.txt
+
+      - name: Run backend tests
+        env:
+          DB_HOST: localhost
+          DB_PORT: 5432
+          DB_NAME: news_pipeline
+          DB_USER: news
+          DB_PASSWORD: news
+          ENVIRONMENT: test
+        run: |
+          cd backend
+          pytest tests/ -v
+
+  test-frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install and build
+        run: |
+          cd frontend
+          npm ci
+          npm run build
+
+  deploy:
+    needs: [test-backend, test-frontend]
+    if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            cd ~/Web-app
+            git pull origin master
+            sudo docker compose build --no-cache
+            sudo docker compose up -d

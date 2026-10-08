@@ -240,7 +240,7 @@ function BiasTrend({ timeline }: { timeline: TimelineResponse }) {
             data: timeline.days.map((d) => d.bias[label] ?? 0),
             borderColor: resolvedBiasColor(label),
             backgroundColor: resolvedBiasColor(label) + "30",
-            fill: true,
+            fill: false,
             tension: 0.3,
             pointRadius: 0,
             pointHoverRadius: 4,
@@ -255,7 +255,7 @@ function BiasTrend({ timeline }: { timeline: TimelineResponse }) {
             legend: { display: false },
             tooltip: {
               callbacks: {
-                label: (ctx) => ` ${ctx.dataset.label}: ${ctx.raw as number}`,
+                label: (ctx) => ` ${ctx.dataset.label}: ${ctx.parsed.y}`,
               },
             },
           },
@@ -263,10 +263,8 @@ function BiasTrend({ timeline }: { timeline: TimelineResponse }) {
             x: {
               ticks: { color: ink, maxTicksLimit: 10, maxRotation: 0 },
               grid: { color: grid },
-              stacked: true,
             },
             y: {
-              stacked: true,
               beginAtZero: true,
               ticks: { color: ink, precision: 0 },
               grid: { color: grid },

@@ -59,15 +59,17 @@ export default async function ArticleDetailPage({ params }: Props) {
           rel="noreferrer"
           className="text-brand font-semibold hover:underline"
         >
-          {t.common.readOriginal} &nearr;
+          {t.common.readOriginal} ↗
         </a>
       </p>
 
-      <ArticleImage
-        src={article.image_url}
-        alt={article.title}
-        className="mt-6 max-h-[420px] w-full rounded-[3px] object-cover"
-      />
+      {article.image_url && (
+        <ArticleImage
+          src={article.image_url}
+          alt={article.title}
+          className="mt-6 max-h-[420px] w-full rounded-[3px] object-cover"
+        />
+      )}
 
       {article.bias_scores && (
         <div className="mt-6 bg-surface border border-rule rounded-[3px] p-4 shadow-1">

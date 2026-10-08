@@ -25,15 +25,17 @@ export default async function EventDetailPage({ params }: Props) {
 
   return (
     <div className="rise-in max-w-[900px] py-4">
-      <Link
-        href="/home"
-        className="inline-block text-sm font-semibold text-brand hover:underline mb-6"
-      >
-        &larr; {t.event.backToEvents}
-      </Link>
+      <div className="mb-6">
+        <Link
+          href="/home"
+          className="text-sm font-semibold text-brand hover:underline"
+        >
+          &larr; {t.event.backToEvents}
+        </Link>
+      </div>
 
       {detail.topic && (
-        <span className="text-xs font-semibold uppercase tracking-eyebrow text-amber">
+        <span className="inline-block text-xs font-semibold uppercase tracking-eyebrow text-amber">
           {detail.topic}
         </span>
       )}
@@ -118,7 +120,7 @@ export default async function EventDetailPage({ params }: Props) {
                   rel="noreferrer"
                   className="text-brand font-semibold hover:underline"
                 >
-                  {t.common.readOriginal} &nearr;
+                  {t.common.readOriginal} ↗
                 </a>
               </div>
             </div>

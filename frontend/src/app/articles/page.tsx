@@ -79,11 +79,13 @@ export default async function ArticlesPage({ searchParams }: Props) {
               duration={13 + (article.article_id.charCodeAt(0) % 5)}
               shineColor={["#c48820", "#E8A838", "#f5c563"]}
             />
-            <ArticleImage
-              src={article.image_url}
-              alt={article.title}
-              className="mb-3 h-40 w-full rounded-md object-cover"
-            />
+            {article.image_url && (
+              <ArticleImage
+                src={article.image_url}
+                alt={article.title}
+                className="mb-3 h-40 w-full rounded-md object-cover"
+              />
+            )}
             <div className="flex flex-wrap items-center gap-2">
               <BiasLabel label={article.bias_label} confidence={article.bias_confidence} />
             </div>

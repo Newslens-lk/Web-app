@@ -255,7 +255,7 @@ function BiasTrend({ timeline }: { timeline: TimelineResponse }) {
             legend: { display: false },
             tooltip: {
               callbacks: {
-                label: (ctx) => ` ${ctx.dataset.label}: ${ctx.parsed.y}`,
+                label: (ctx) => ` ${ctx.dataset.label}: ${ctx.raw as number}`,
               },
             },
           },

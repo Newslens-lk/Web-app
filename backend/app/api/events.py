@@ -148,6 +148,7 @@ def get_event(event_id: UUID, db: Session = Depends(get_db)) -> EventDetail:
         event_id=event.event_id,
         summary=event.summary,
         topic=event.topic,
+        representative_title=event.representative_title,
         article_count=len(articles),
         source_count=source_count,
         window_start=event.window_start,

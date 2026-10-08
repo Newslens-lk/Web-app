@@ -44,6 +44,7 @@ class EventDetail(BaseModel):
     event_id: UUID
     summary: str | None
     topic: str | None
+    representative_title: str | None = None
     article_count: int
     source_count: int
     window_start: datetime | None

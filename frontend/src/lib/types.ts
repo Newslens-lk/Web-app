@@ -41,6 +41,7 @@ export type EventDetail = {
   event_id: string;
   summary: string | null;
   topic: string | null;
+  representative_title: string | null;
   article_count: number;
   source_count: number;
   window_start: string | null;

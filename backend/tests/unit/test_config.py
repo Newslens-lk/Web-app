@@ -17,7 +17,8 @@ runs them.
 from app.core.config import Settings, get_settings
 
 
-def test_defaults_are_used_when_no_env_or_dotenv_present():
+def test_defaults_are_used_when_no_env_or_dotenv_present(monkeypatch):
+    monkeypatch.delenv("DB_HOST", raising=False)
     settings = Settings(_env_file=None)
 
     assert settings.db_host == "news-db"

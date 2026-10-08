@@ -17,6 +17,7 @@ def make_fake_event(**overrides):
         event_id=EVENT_ID,
         summary="A summary",
         topic="politics",
+        representative_title="Test headline",
         article_count=2,
         source_count=2,
         window_start=datetime(2026, 9, 1, tzinfo=timezone.utc),
@@ -37,6 +38,7 @@ def make_fake_article(**overrides):
         bias_label="left",
         bias_confidence=0.6,
         bias_scores=None,
+        image_url=None,
     )
     defaults.update(overrides)
     return SimpleNamespace(**defaults)

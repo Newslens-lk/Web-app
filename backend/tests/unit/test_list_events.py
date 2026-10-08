@@ -23,6 +23,7 @@ def make_fake_event(**overrides):
         event_id=EVENT_ID,
         summary=None,
         topic="politics",
+        representative_title=None,
         article_count=3,
         source_count=2,
         window_start=datetime(2026, 9, 1, tzinfo=timezone.utc),
@@ -61,13 +62,13 @@ def test_default_pagination_is_page_1_size_20(client, override_get_db):
     assert body["page_size"] == 20
 
 
-def test_representative_title_uses_event_summary_when_present(client, override_get_db):
-    event = make_fake_event(summary="A real written summary")
+def test_representative_title_uses_event_representative_title_when_present(client, override_get_db):
+    event = make_fake_event(representative_title="A common headline")
     override_get_db(make_fake_db(total=1, events=[event], rows_per_event=[[("Some article title", "BBC")]]))
 
     response = client.get("/api/events")
 
-    assert response.json()["events"][0]["representative_title"] == "A real written summary"
+    assert response.json()["events"][0]["representative_title"] == "A common headline"
 
 
 def test_representative_title_falls_back_to_first_article_when_no_summary(client, override_get_db):

@@ -166,16 +166,28 @@ def top_events(
     if date_to:
         conditions.append(Event.window_end <= datetime.combine(date_to, time.max, COLOMBO))
 
+    # Summaries are optional prose, not headlines. Recover missing event titles
+    # from the newest titled article and omit titleless entries before limiting.
+    article_title = func.nullif(func.trim(Article.title), "")
+    latest_title = (
+        select(article_title)
+        .where(Article.event_id == Event.event_id, article_title.isnot(None))
+        .order_by(Article.published_at.desc().nullslast(), Article.article_id)
+        .limit(1)
+        .correlate(Event)
+        .scalar_subquery()
+    )
+    title = func.coalesce(func.nullif(func.trim(Event.representative_title), ""), latest_title)
     stmt = (
-        select(Event)
-        .where(*conditions)
+        select(Event, title)
+        .where(*conditions, title.isnot(None))
         .order_by(Event.article_count.desc())
         .limit(limit)
     )
-    events = list(db.scalars(stmt))
+    events = db.execute(stmt).all()
 
     result = []
-    for event in events:
+    for event, event_title in events:
         articles = db.execute(
             select(Article.bias_label)
             .where(Article.event_id == event.event_id)
@@ -187,7 +199,7 @@ def top_events(
                 bias[label_str] += 1
         result.append(TopEvent(
             event_id=str(event.event_id),
-            title=event.summary or "Untitled event",
+            title=event_title,
             article_count=event.article_count,
             source_count=event.source_count,
             bias_distribution=bias,

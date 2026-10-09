@@ -120,7 +120,7 @@ export const en = {
       `${articles} article${articles !== 1 ? "s" : ""} from ${sources} source${sources !== 1 ? "s" : ""}${date ? ` · ${date}` : ""}`,
     summarize: "Summarize",
     summarizing: "Generating summary…",
-    summaryTitle: "AI Summary",
+    summaryTitle: "Summary",
     summaryError: "Failed to generate summary. Please try again.",
   },
 

@@ -162,9 +162,9 @@ def top_events(
 
     conditions = []
     if date_from:
-        conditions.append(Event.window_start >= datetime.combine(date_from, time.min, COLOMBO))
+        conditions.append(Event.window_end >= datetime.combine(date_from, time.min, COLOMBO))
     if date_to:
-        conditions.append(Event.window_end <= datetime.combine(date_to, time.max, COLOMBO))
+        conditions.append(Event.window_start <= datetime.combine(date_to, time.max, COLOMBO))
 
     stmt = (
         select(Event)
@@ -187,7 +187,7 @@ def top_events(
                 bias[label_str] += 1
         result.append(TopEvent(
             event_id=str(event.event_id),
-            title=event.summary or "Untitled event",
+            title=event.representative_title or event.topic or "Untitled event",
             article_count=event.article_count,
             source_count=event.source_count,
             bias_distribution=bias,

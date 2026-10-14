@@ -4,6 +4,7 @@ from uuid import UUID
 from pydantic import BaseModel, ConfigDict, field_validator
 
 from app.core.article_images import usable_image_url
+from app.core.sinhala import fix_conjuncts
 
 
 class ImageResponse(BaseModel):
@@ -15,7 +16,14 @@ class ImageResponse(BaseModel):
         return usable_image_url(value)
 
 
-class ArticleSummary(ImageResponse):
+class SinhalaTextMixin:
+    @field_validator("title", "body", "body_excerpt", mode="before", check_fields=False)
+    @classmethod
+    def fix_sinhala(cls, v: str | None) -> str | None:
+        return fix_conjuncts(v)
+
+
+class ArticleSummary(ImageResponse, SinhalaTextMixin):
     model_config = ConfigDict(from_attributes=True)
 
     article_id: str
@@ -30,7 +38,7 @@ class ArticleSummary(ImageResponse):
     event_id: UUID | None
 
 
-class ArticleDetail(ImageResponse):
+class ArticleDetail(ImageResponse, SinhalaTextMixin):
     model_config = ConfigDict(from_attributes=True)
 
     article_id: str
@@ -48,7 +56,7 @@ class ArticleDetail(ImageResponse):
     event_id: UUID | None
 
 
-class ArticleInEvent(ImageResponse):
+class ArticleInEvent(ImageResponse, SinhalaTextMixin):
     model_config = ConfigDict(from_attributes=True)
 
     article_id: str
@@ -70,7 +78,7 @@ class ArticleList(BaseModel):
     page_size: int
 
 
-class SimilarArticle(BaseModel):
+class SimilarArticle(BaseModel, SinhalaTextMixin):
     article_id: str
     title: str
     source_name: str

@@ -1,8 +1,9 @@
 from datetime import datetime
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, field_validator
 
+from app.core.sinhala import fix_conjuncts
 from app.schemas.article import ArticleInEvent
 
 BIAS_LABELS = ("far_left", "left", "center", "right", "far_right")
@@ -32,6 +33,11 @@ class EventSummary(BaseModel):
     bias_distribution: BiasDistribution
     image_url: str | None = None
 
+    @field_validator("representative_title", "summary", mode="before")
+    @classmethod
+    def fix_sinhala(cls, v: str | None) -> str | None:
+        return fix_conjuncts(v)
+
 
 class EventList(BaseModel):
     events: list[EventSummary]
@@ -51,3 +57,8 @@ class EventDetail(BaseModel):
     window_end: datetime | None
     articles: list[ArticleInEvent]
     bias_distribution: BiasDistribution
+
+    @field_validator("representative_title", "summary", mode="before")
+    @classmethod
+    def fix_sinhala(cls, v: str | None) -> str | None:
+        return fix_conjuncts(v)

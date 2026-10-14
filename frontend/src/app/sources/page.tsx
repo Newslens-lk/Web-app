@@ -6,7 +6,8 @@ import { getDictionary } from "@/lib/i18n/server";
 
 export default async function SourcesPage() {
   const t = getDictionary();
-  const { sources } = await getSources();
+  const { sources: allSources } = await getSources();
+  const sources = allSources.filter((s) => s.source_name !== "divainalk");
 
   return (
     <div className="rise-in">

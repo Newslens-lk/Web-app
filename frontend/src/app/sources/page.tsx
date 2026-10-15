@@ -2,12 +2,12 @@ import Link from "next/link";
 import { getSources } from "@/lib/api";
 import { ShineBorder } from "@/components/ShineBorder";
 import { SourceBadge } from "@/components/SourceBadge";
-import { relativeTime } from "@/lib/api";
 import { getDictionary } from "@/lib/i18n/server";
 
 export default async function SourcesPage() {
   const t = getDictionary();
-  const { sources } = await getSources();
+  const { sources: allSources } = await getSources();
+  const sources = allSources.filter((s) => s.source_name !== "divainalk");
 
   return (
     <div className="rise-in">
@@ -38,12 +38,6 @@ export default async function SourcesPage() {
                   {source.article_count}
                 </span>{" "}
                 {t.sources.scraped}
-              </p>
-              <p className="mt-0.5">
-                {t.sources.latest}{" "}
-                {source.latest_article_at
-                  ? relativeTime(source.latest_article_at, t)
-                  : t.sources.noneYet}
               </p>
             </div>
           </Link>

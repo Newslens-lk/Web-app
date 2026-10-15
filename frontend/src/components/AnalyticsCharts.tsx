@@ -370,7 +370,7 @@ function BiasDoughnut({
     chartRef.current?.destroy();
     const css = getComputedStyle(document.documentElement);
     const ink = css.getPropertyValue("--ink").trim();
-    const dist = classified(publisher.bias_distribution);
+    const dist = classified(publisher.bias_distribution).slice().reverse();
 
     import("chart.js/auto").then(({ default: ChartJS }) => {
       if (!canvasRef.current) return;

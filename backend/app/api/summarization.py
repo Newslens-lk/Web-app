@@ -7,6 +7,7 @@ Two separate steps:
 Isolated from the rest of the API — no existing endpoints are modified.
 """
 
+import time
 import uuid as _uuid
 from uuid import UUID
 
@@ -135,6 +136,9 @@ def summarize_event(
         raise HTTPException(status_code=404, detail=str(exc)) from exc
     except RuntimeError as exc:
         raise HTTPException(status_code=503, detail=str(exc)) from exc
+
+    # DEMO: artificial delay so the loading animation is visible during presentation.
+    time.sleep(30)
 
     # Refresh to get the topic that generate_summary may have also set.
     db.refresh(event)

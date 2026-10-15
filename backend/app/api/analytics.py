@@ -162,9 +162,9 @@ def top_events(
 
     conditions = []
     if date_from:
-        conditions.append(Event.window_start >= datetime.combine(date_from, time.min, COLOMBO))
+        conditions.append(Event.window_end >= datetime.combine(date_from, time.min, COLOMBO))
     if date_to:
-        conditions.append(Event.window_end <= datetime.combine(date_to, time.max, COLOMBO))
+        conditions.append(Event.window_start <= datetime.combine(date_to, time.max, COLOMBO))
 
     # Summaries are optional prose, not headlines. Recover missing event titles
     # from the newest titled article and omit titleless entries before limiting.
